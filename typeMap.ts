@@ -80,7 +80,9 @@ export const typeMapper = (prismaSchema: PrismaMap) => {
         return type.name;
       }
 
-      throw new Error(`Unknown type ${type}`);
+      throw new Error(
+        `Unknown type ${type} - ${JSON.stringify(type, null, 2)}`,
+      );
     };
 
     const suffix = parentWasNotNull ? "" : " | undefined";

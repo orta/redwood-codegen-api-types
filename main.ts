@@ -9,6 +9,8 @@ import {
 } from "./utils.ts";
 import { typeMapper } from "./typeMap.ts";
 import { PrismaMap, prismaModeller } from "./prismaModeller.ts";
+import { createSharedSchemaFiles } from "./sharedSchema.ts";
+import { AppContext } from "./context.ts";
 
 const pathToGraphQL = "/Users/orta/dev/puzmo/.redwood/schema.graphql";
 const fileToRead = "/Users/orta/dev/puzmo/api/src/services/users/users.ts";
@@ -30,15 +32,16 @@ const getPrismaSchemaFromFile = async () => {
   prismaSchema = prismaModeller(prismaSchemaBlocks);
 };
 
-const getFileTSInfo = async (file: string) => {
-  if (!gqlSchema) throw new Error("No schema");
-  if (!prismaSchema) throw new Error("No prisma schema");
+const getFileTSInfo = async (file: string, context: AppContext) => {
+  const { gql, prisma, tsProject, settings } = context;
+
+  if (!gql) throw new Error("No schema");
+  if (!prisma) throw new Error("No prisma schema");
 
   // This isn't good enough, needs to be relative to api/src/services
   const filename = path.basename(file);
   const fileContents = await Deno.readTextFile(file);
-  const project = new Project({ useInMemoryFileSystem: true });
-  const referenceFileSourceFile = project.createSourceFile(
+  const referenceFileSourceFile = context.tsProject.createSourceFile(
     `/source/${filename}`,
     fileContents,
   );
@@ -53,7 +56,7 @@ const getFileTSInfo = async (file: string) => {
   const resolverContainers = vars.filter(varStartsWithUppercase);
   const queryResolvers = vars.filter((v) => !varStartsWithUppercase(v));
 
-  const fileDTS = project.createSourceFile(
+  const fileDTS = context.tsProject.createSourceFile(
     "/source/index.d.ts",
     "",
     { overwrite: true },
@@ -134,7 +137,7 @@ const getFileTSInfo = async (file: string) => {
   if (sharedGraphQLObjectsReferenced.types.length) {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
-      moduleSpecifier: "./shared-schema-types.d.ts",
+      moduleSpecifier: `./${settings.sharedFilename}`,
       namedImports: sharedGraphQLObjectsReferenced.types,
     });
   }
@@ -171,6 +174,20 @@ if (import.meta.main) {
   await getGraphQLSDLFromFile();
   await getPrismaSchemaFromFile();
 
-  await getFileTSInfo(fileToRead);
+  const project = new Project({ useInMemoryFileSystem: true });
+
+  const appContext: AppContext = {
+    gql: gqlSchema!,
+    prisma: prismaSchema,
+    tsProject: project,
+    settings: {
+      sharedFilename: "shared-schema-types.d.ts",
+    },
+  };
+
+  // Test one rando file
+  // await getFileTSInfo(fileToRead, appContext);
+
+  createSharedSchemaFiles(appContext);
   // console.log(prismaSchema.list)
 }

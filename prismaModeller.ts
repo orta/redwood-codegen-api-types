@@ -1,25 +1,58 @@
-import { PrismaSchemaBlocks, PrismaModel } from "./deps.ts";
+import { PrismaProperty, PrismaSchemaBlocks } from "./deps.ts";
 
 type Model = {
-    rootComments: string[]
-    properties: PrismaModel["properties"]
-}
+  leadingComments: string;
+  properties: Map<string, {
+    leadingComments: string;
+    property: PrismaProperty;
+  }>;
+};
 
-export type PrismaMap = ReadonlyMap<string, Model>
+export type PrismaMap = ReadonlyMap<string, Model>;
 
 export const prismaModeller = (schema: PrismaSchemaBlocks) => {
-    
-    const types = new Map<string, Model>()
+  const types = new Map<string, Model>();
 
-    let leadingComments: string[] = []
-    schema.list.forEach(b => {
-        if (b.type === "comment") leadingComments.push(b.text)
-        
-        if (b.type === "model") {
-            types.set(b.name, { properties: b.properties, rootComments: leadingComments})
-            leadingComments = []
-        } 
-    })
+  let leadingComments: string[] = [];
+  schema.list.forEach((b) => {
+    if (b.type === "comment") {
+      leadingComments.push(b.text.replace("/// ", "").replace("// ", ""));
+    }
 
-    return types
-}
+    if (b.type === "model") {
+      const properties = new Map<string, {
+        leadingComments: string;
+        property: PrismaProperty;
+      }>();
+
+      let leadingFieldComments: string[] = [];
+      // Loop through all the properties and keep track of the
+      // comments before them
+      b.properties.forEach((p) => {
+        if (p.type === "comment") {
+          leadingFieldComments.push(
+            p.text.replace("/// ", "").replace("// ", ""),
+          );
+        } else if (p.type === "break") {
+          leadingFieldComments.push("");
+        } else if (p.type === "attribute" || p.type === "field") {
+          properties.set(p.name, {
+            leadingComments: leadingFieldComments.join("\n"),
+            property: p,
+          });
+          leadingFieldComments = [];
+        }
+      });
+
+      types.set(b.name, {
+        properties,
+        leadingComments: leadingComments.join("\n"),
+      });
+
+      //   console.log(b.name, [...properties.keys()]);
+      leadingComments = [];
+    }
+  });
+
+  return types;
+};

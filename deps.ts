@@ -8,5 +8,6 @@ export type { Node } from "npm:typescript@^4.9";
 export { getSchema as getPrismaSchema } from "npm:@mrleebo/prisma-ast@0.4.1";
 export type {
   Model as PrismaModel,
+  Property as PrismaProperty,
   Schema as PrismaSchemaBlocks,
 } from "npm:@mrleebo/prisma-ast@0.4.1";
