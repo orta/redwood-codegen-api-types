@@ -64,7 +64,7 @@ const getFileTSInfo = async (file: string) => {
   const mutationType = gqlSchema!.getMutationType();
   if (!mutationType) throw new Error("No query type");
 
-  const { map, getReferencedGraphQLTypesInMapping } = typeMapper(prismaSchema);
+  const { map, getReferencedGraphQLThingsInMapping } = typeMapper(prismaSchema);
 
   queryResolvers.forEach((v, i) => {
     // if (i !== 8) return;
@@ -136,13 +136,22 @@ const getFileTSInfo = async (file: string) => {
     namedImports: ["GraphQLResolveInfo"],
   });
 
-  const sharedGraphQLObjectsReferenced = getReferencedGraphQLTypesInMapping();
-  if (sharedGraphQLObjectsReferenced.length) {
+  const sharedGraphQLObjectsReferenced = getReferencedGraphQLThingsInMapping();
+  if (sharedGraphQLObjectsReferenced.types.length) {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
       moduleSpecifier: "./shared-schema-types.d.ts",
-      namedImports: sharedGraphQLObjectsReferenced,
+      namedImports: sharedGraphQLObjectsReferenced.types,
     });
+
+    if (sharedGraphQLObjectsReferenced.scalars.length) {
+      fileDTS.addTypeAliases(
+        sharedGraphQLObjectsReferenced.scalars.map((s) => ({
+          name: s,
+          type: "any",
+        })),
+      );
+    }
   }
 
   console.log(fileDTS.getText());

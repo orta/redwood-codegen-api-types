@@ -2,13 +2,18 @@ import { graphql } from "./deps.ts";
 import { PrismaMap } from "./prismaModeller.ts";
 
 export const typeMapper = (prismaSchema: PrismaMap) => {
-  let referencedGraphQLTypes: string[] = [];
+  const referencedGraphQLTypes = new Set<string>();
+  const customScalars = new Set<string>();
 
   const clear = () => {
-    referencedGraphQLTypes = [];
+    referencedGraphQLTypes.clear();
+    customScalars.clear();
   };
-  const getReferencedGraphQLTypesInMapping = () => {
-    return [...referencedGraphQLTypes];
+  const getReferencedGraphQLThingsInMapping = () => {
+    return {
+      types: [...referencedGraphQLTypes.keys()],
+      scalars: [...customScalars.keys()],
+    };
   };
 
   const map = (
@@ -31,14 +36,26 @@ export const typeMapper = (prismaSchema: PrismaMap) => {
         }
       }
       if (graphql.isScalarType(type)) {
-        return scalarMapper(type) || type.name;
+        switch (type.toString()) {
+          case "Int":
+            return "number";
+          case "Float":
+            return "number";
+          case "String":
+            return "string";
+          case "Boolean":
+            return "boolean";
+        }
+
+        customScalars.add(type.name);
+        return type.name;
       }
       if (graphql.isObjectType(type)) {
         if (prismaSchema.has(type.name)) {
           return "PrismaModel" + type.name;
         } else {
           // GraphQL only type
-          referencedGraphQLTypes.push(type.name);
+          referencedGraphQLTypes.add(type.name);
           return type.name;
         }
       }
@@ -53,7 +70,7 @@ export const typeMapper = (prismaSchema: PrismaMap) => {
         return type.name;
       }
       if (graphql.isInputObjectType(type)) {
-        referencedGraphQLTypes.push(type.name);
+        referencedGraphQLTypes.add(type.name);
 
         return type.name;
       }
@@ -65,19 +82,5 @@ export const typeMapper = (prismaSchema: PrismaMap) => {
     return getInner() + suffix;
   };
 
-  return { map, clear, getReferencedGraphQLTypesInMapping };
-};
-
-export const scalarMapper = (type: graphql.GraphQLType) => {
-  switch (type.toString()) {
-    case "Int":
-      return "number";
-    case "Float":
-      return "number";
-    case "String":
-      return "string";
-    case "Boolean":
-      return "boolean";
-  }
-  return `any /** ${type.toString()} */`;
+  return { map, clear, getReferencedGraphQLThingsInMapping };
 };
