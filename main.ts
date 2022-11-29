@@ -3,6 +3,7 @@ import * as path from "https://deno.land/std@0.166.0/path/mod.ts";
 import { getPrismaSchema, graphql, Project } from "./deps.ts";
 import {
   capitalizeFirstLetter,
+  createAndReferOrInlineArgsForField,
   variableDeclarationIsAsync,
   varStartsWithUppercase,
 } from "./utils.ts";
@@ -10,7 +11,7 @@ import { typeMapper } from "./typeMap.ts";
 import { PrismaMap, prismaModeller } from "./prismaModeller.ts";
 
 const pathToGraphQL = "/Users/orta/dev/puzmo/.redwood/schema.graphql";
-const fileToRead = "/Users/orta/dev/puzmo/api/src/services/dailies/dailies.ts";
+const fileToRead = "/Users/orta/dev/puzmo/api/src/services/users/users.ts";
 const prismaFile = "/Users/orta/dev/puzmo/api/db/schema.prisma";
 
 let gqlSchema: graphql.GraphQLSchema | undefined;
@@ -97,20 +98,13 @@ const getFileTSInfo = async (file: string) => {
       isExported: true,
     });
 
-    if (field.args.length) {
-      const argsInterface = fileDTS.addInterface({
-        name: `${interfaceDeclaration.getName()}Args`,
-        isExported: true,
-      });
+    const args = createAndReferOrInlineArgsForField(field, {
+      name: interfaceDeclaration.getName(),
+      file: fileDTS,
+      mapper: map,
+    });
 
-      field.args.forEach((a) => {
-        argsInterface.addProperty({ name: a.name, type: map(a.type) });
-      });
-    }
-
-    const argsParam = field.args.length
-      ? `${interfaceDeclaration.getName()}Args`
-      : "{}";
+    const argsParam = args || "{}";
 
     const parentType =
       config.parentName === "Query" || config.parentName === "Mutation"
@@ -143,15 +137,25 @@ const getFileTSInfo = async (file: string) => {
       moduleSpecifier: "./shared-schema-types.d.ts",
       namedImports: sharedGraphQLObjectsReferenced.types,
     });
+  }
 
-    if (sharedGraphQLObjectsReferenced.scalars.length) {
-      fileDTS.addTypeAliases(
-        sharedGraphQLObjectsReferenced.scalars.map((s) => ({
-          name: s,
-          type: "any",
-        })),
-      );
-    }
+  if (sharedGraphQLObjectsReferenced.scalars.length) {
+    fileDTS.addTypeAliases(
+      sharedGraphQLObjectsReferenced.scalars.map((s) => ({
+        name: s,
+        type: "any",
+      })),
+    );
+  }
+
+  if (sharedGraphQLObjectsReferenced.prisma.length) {
+    fileDTS.addImportDeclaration({
+      isTypeOnly: true,
+      moduleSpecifier: "@prisma/client",
+      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) =>
+        `${p} as P${p}`
+      ),
+    });
   }
 
   console.log(fileDTS.getText());

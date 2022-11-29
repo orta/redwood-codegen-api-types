@@ -1,18 +1,22 @@
 import { graphql } from "./deps.ts";
 import { PrismaMap } from "./prismaModeller.ts";
 
+export type TypeMapper = ReturnType<typeof typeMapper>;
 export const typeMapper = (prismaSchema: PrismaMap) => {
   const referencedGraphQLTypes = new Set<string>();
+  const referencedPrismaModels = new Set<string>();
   const customScalars = new Set<string>();
 
   const clear = () => {
     referencedGraphQLTypes.clear();
     customScalars.clear();
+    referencedPrismaModels.clear();
   };
   const getReferencedGraphQLThingsInMapping = () => {
     return {
       types: [...referencedGraphQLTypes.keys()],
       scalars: [...customScalars.keys()],
+      prisma: [...referencedPrismaModels.keys()],
     };
   };
 
@@ -52,7 +56,8 @@ export const typeMapper = (prismaSchema: PrismaMap) => {
       }
       if (graphql.isObjectType(type)) {
         if (prismaSchema.has(type.name)) {
-          return "PrismaModel" + type.name;
+          referencedPrismaModels.add(type.name);
+          return "P" + type.name;
         } else {
           // GraphQL only type
           referencedGraphQLTypes.add(type.name);
