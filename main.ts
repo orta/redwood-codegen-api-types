@@ -1,12 +1,13 @@
 import * as path from "https://deno.land/std@0.166.0/path/mod.ts";
 
+import { getPrismaSchema, graphql, Project } from "./deps.ts";
 import {
-  getPrismaSchema,
-  graphql,
-  PrismaSchema,
-  Project,
-} from "./deps.ts";
-import { capitalizeFirstLetter, varStartsWithUppercase } from "./utils.ts";
+  capitalizeFirstLetter,
+  variableDeclarationIsAsync,
+  varStartsWithUppercase,
+} from "./utils.ts";
+import { typeMapper } from "./typeMap.ts";
+import { PrismaMap, prismaModeller } from "./prismaModeller.ts";
 
 const pathToGraphQL = "/Users/orta/dev/puzmo/.redwood/schema.graphql";
 const fileToRead = "/Users/orta/dev/puzmo/api/src/services/dailies/dailies.ts";
@@ -18,13 +19,14 @@ const getGraphQLSDLFromFile = async () => {
   gqlSchema = graphql.buildSchema(schema);
 };
 
-let prismaSchema: PrismaSchema | undefined;
+let prismaSchema: PrismaMap = new Map();
 const getPrismaSchemaFromFile = async () => {
   const prismaSchemaText = await Deno.readTextFile(prismaFile);
   //
-  prismaSchema = getPrismaSchema(
+  const prismaSchemaBlocks = getPrismaSchema(
     prismaSchemaText.replaceAll("@default([])", "@default([1])"),
   );
+  prismaSchema = prismaModeller(prismaSchemaBlocks);
 };
 
 const getFileTSInfo = async (file: string) => {
@@ -50,11 +52,9 @@ const getFileTSInfo = async (file: string) => {
   const resolverContainers = vars.filter(varStartsWithUppercase);
   const queryResolvers = vars.filter((v) => !varStartsWithUppercase(v));
 
-  // console.log(queryResolvers.map(v => v.getName()))
-
   const fileDTS = project.createSourceFile(
     "/source/index.d.ts",
-    "/** Codegen */",
+    "",
     { overwrite: true },
   );
 
@@ -64,11 +64,20 @@ const getFileTSInfo = async (file: string) => {
   const mutationType = gqlSchema!.getMutationType();
   if (!mutationType) throw new Error("No query type");
 
-  queryResolvers.forEach((v) => {
-    addTypeForQueryResolver(v.getName());
+  const { map, getReferencedGraphQLTypesInMapping } = typeMapper(prismaSchema);
+
+  queryResolvers.forEach((v, i) => {
+    // if (i !== 8) return;
+    addTypeForQueryResolver(v.getName(), {
+      parentName: queryType.name,
+      isAsync: variableDeclarationIsAsync(v),
+    });
   });
 
-  function addTypeForQueryResolver(name: string) {
+  function addTypeForQueryResolver(
+    name: string,
+    config: { isAsync: boolean; parentName: string },
+  ) {
     let isQuery = true;
     let field = queryType!.getFields()[name];
     if (!field) {
@@ -95,32 +104,47 @@ const getFileTSInfo = async (file: string) => {
       });
 
       field.args.forEach((a) => {
-        if(a.type)
-        argsInterface.addProperty({ name: a.name, type: a.type.toString() });
+        argsInterface.addProperty({ name: a.name, type: map(a.type) });
       });
     }
 
     const argsParam = field.args.length
       ? `${interfaceDeclaration.getName()}Args`
       : "{}";
-  
+
+    const parentType =
+      config.parentName === "Query" || config.parentName === "Mutation"
+        ? "{}"
+        : config.parentName;
+
     interfaceDeclaration.addCallSignature({
-      parameters: [{ name: "args", type: argsParam }, { name: "obj", type: "any", }],
+      docs: ["SDL: " + graphql.print(field.astNode!)],
+      parameters: [{ name: "args", type: argsParam }, {
+        name: "obj",
+        type:
+          `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+      }],
+      returnType: config.isAsync
+        ? `Promise<${map(field.type)}>`
+        : map(field.type),
     });
-
-    //  obj?: { root: TParent; context: TContext; info: GraphQLResolveInfo }
-
-    // interfaceDeclaration.addCallSignature({
-    //   parameters:
-    // })
-
-    // const interfaceProperty = interfaceDeclaration .addProperty({
-    //     name: 'name',
-    //     type: 'number',
-    // })
-    // interfaceProperty.setHasQuestionToken(true);
-    // InterfaceDeclaration.addExtends('InterfaceToExtend')
   }
+
+  fileDTS.addImportDeclaration({
+    isTypeOnly: true,
+    moduleSpecifier: "graphql",
+    namedImports: ["GraphQLResolveInfo"],
+  });
+
+  const sharedGraphQLObjectsReferenced = getReferencedGraphQLTypesInMapping();
+  if (sharedGraphQLObjectsReferenced.length) {
+    fileDTS.addImportDeclaration({
+      isTypeOnly: true,
+      moduleSpecifier: "./shared-schema-types.d.ts",
+      namedImports: sharedGraphQLObjectsReferenced,
+    });
+  }
+
   console.log(fileDTS.getText());
 };
 
@@ -129,6 +153,7 @@ if (import.meta.main) {
   Deno.stdout.write(
     new TextEncoder().encode("\x1b[2J"),
   );
+  console.log("-----------------------\n");
 
   await getGraphQLSDLFromFile();
   await getPrismaSchemaFromFile();
