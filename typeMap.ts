@@ -1,8 +1,13 @@
+import { AppContext } from "./context.ts";
 import { graphql } from "./deps.ts";
 import { PrismaMap } from "./prismaModeller.ts";
 
 export type TypeMapper = ReturnType<typeof typeMapper>;
-export const typeMapper = (prismaSchema: PrismaMap) => {
+
+export const typeMapper = (
+  context: AppContext,
+  config: { preferPrismaModels?: true },
+) => {
   const referencedGraphQLTypes = new Set<string>();
   const referencedPrismaModels = new Set<string>();
   const customScalars = new Set<string>();
@@ -55,7 +60,7 @@ export const typeMapper = (prismaSchema: PrismaMap) => {
         return type.name;
       }
       if (graphql.isObjectType(type)) {
-        if (prismaSchema.has(type.name)) {
+        if (config.preferPrismaModels && context.prisma.has(type.name)) {
           referencedPrismaModels.add(type.name);
           return "P" + type.name;
         } else {

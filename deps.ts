@@ -11,3 +11,5 @@ export type {
   Property as PrismaProperty,
   Schema as PrismaSchemaBlocks,
 } from "npm:@mrleebo/prisma-ast@0.4.1";
+
+export * as path from "https://deno.land/std@0.166.0/path/mod.ts";

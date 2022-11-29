@@ -1,7 +1,7 @@
 /// The main schema for objects and inputs
 
 import { AppContext } from "./context.ts";
-import { graphql } from "./deps.ts";
+import { graphql, path } from "./deps.ts";
 import { typeMapper } from "./typeMap.ts";
 
 export const createSharedSchemaFiles = (context: AppContext) => {
@@ -11,7 +11,7 @@ export const createSharedSchemaFiles = (context: AppContext) => {
   const types = gql.getTypeMap();
   const knownPrimitives = ["String", "Boolean", "Int"];
 
-  const mapper = typeMapper(new Map());
+  const mapper = typeMapper(context, {});
 
   const tsFile = context.tsProject.createSourceFile(
     `/source/${context.settings.sharedFilename}`,
@@ -55,7 +55,32 @@ export const createSharedSchemaFiles = (context: AppContext) => {
         }),
       });
     }
+
+    if (graphql.isEnumType(type)) {
+      tsFile.addTypeAlias({
+        name: type.name,
+        type: '"' + type.getValues().map((m) => m.value).join('" | "') + '"',
+      });
+    }
   });
 
-  console.log(tsFile.getText());
+  const { scalars } = mapper.getReferencedGraphQLThingsInMapping();
+  if (scalars.length) {
+    tsFile.addTypeAliases(
+      scalars.map((s) => ({
+        name: s,
+        type: "any",
+      })),
+    );
+  }
+
+  Deno.writeTextFileSync(
+    path.join(
+      context.settings.typesFolderRoot,
+      context.settings.sharedFilename,
+    ),
+    tsFile.getText(),
+  );
+
+  // console.log(tsFile.getText());
 };

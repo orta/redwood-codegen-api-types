@@ -6,6 +6,11 @@ export type AppContext = {
   prisma: PrismaMap;
   tsProject: tsMorph.Project;
   settings: {
+    root: string;
+    graphQLSchemaPath: string;
+    apiServicesPath: string;
     sharedFilename: string;
+    prismaDSLPath: string;
+    typesFolderRoot: string;
   };
 };
