@@ -71,7 +71,7 @@ if (import.meta.main) {
         appContext.settings.apiServicesPath,
         dirEntry.name,
       );
-      // And these are the files i nthem
+      // And these are the files in them
       for await (const subdirEntry of Deno.readDir(folderPath)) {
         if (subdirEntry.isFile && subdirEntry.name.endsWith(".ts")) {
           serviceFilesToLookAt.push(path.join(folderPath, subdirEntry.name));

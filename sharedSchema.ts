@@ -81,6 +81,4 @@ export const createSharedSchemaFiles = (context: AppContext) => {
     ),
     tsFile.getText(),
   );
-
-  // console.log(tsFile.getText());
 };
