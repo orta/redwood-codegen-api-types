@@ -6,58 +6,54 @@ import { AppContext } from "./context.ts";
 import { getFileTSInfo } from "./serviceFile.ts";
 
 let gqlSchema: graphql.GraphQLSchema | undefined;
-const getGraphQLSDLFromFile = async () => {
-  const schema = await Deno.readTextFile(pathToGraphQL);
+const getGraphQLSDLFromFile = async (settings: AppContext["settings"]) => {
+  const schema = await Deno.readTextFile(settings.graphQLSchemaPath);
   gqlSchema = graphql.buildSchema(schema);
 };
 
 let prismaSchema: PrismaMap = new Map();
-const getPrismaSchemaFromFile = async () => {
-  const prismaSchemaText = await Deno.readTextFile(prismaFile);
+const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
+  const prismaSchemaText = await Deno.readTextFile(settings.prismaDSLPath);
   //
   const prismaSchemaBlocks = getPrismaSchema(
     prismaSchemaText.replaceAll("@default([])", "@default([1])"),
   );
   prismaSchema = prismaModeller(prismaSchemaBlocks);
 };
-const pathToGraphQL = "/Users/orta/dev/puzmo/.redwood/schema.graphql";
-const redwoodProjectRoot = "/Users/orta/dev/puzmo/";
-const prismaFile = "/Users/orta/dev/puzmo/api/db/schema.prisma";
+
+// Mac
+// const redwoodProjectRoot = "/Users/orta/dev/puzmo/site/";
+/// Linux
+const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
-  Deno.stdout.write(
-    new TextEncoder().encode("\x1b[2J"),
-  );
+  Deno.stdout.write(new TextEncoder().encode("\x1b[2J"));
   console.log("-----------------------\n");
-
-  await getGraphQLSDLFromFile();
-  await getPrismaSchemaFromFile();
-
   const project = new Project({ useInMemoryFileSystem: true });
 
+  const settings: AppContext["settings"] = {
+    root: redwoodProjectRoot,
+    graphQLSchemaPath: path.join(
+      redwoodProjectRoot,
+      ".redwood",
+      "schema.graphql",
+    ),
+    apiServicesPath: path.join(redwoodProjectRoot, "api", "src", "services"),
+    prismaDSLPath: path.join(redwoodProjectRoot, "api", "db", "schema.prisma"),
+    sharedFilename: "shared-schema-types.d.ts",
+    typesFolderRoot:
+      "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
+  };
+
+  await getGraphQLSDLFromFile(settings);
+  await getPrismaSchemaFromFile(settings);
+
   const appContext: AppContext = {
-    gql: gqlSchema!,
+    gql: gqlSchema,
     prisma: prismaSchema,
     tsProject: project,
-    settings: {
-      root: redwoodProjectRoot,
-      graphQLSchemaPath: path.join(
-        redwoodProjectRoot,
-        ".redwood",
-        "schema.graphql",
-      ),
-      apiServicesPath: path.join(redwoodProjectRoot, "api", "src", "services"),
-      prismaDSLPath: path.join(
-        redwoodProjectRoot,
-        "api",
-        "db",
-        "schema.prisma",
-      ),
-      sharedFilename: "shared-schema-types.d.ts",
-      typesFolderRoot:
-        "/Users/orta/dev/redwood-codegen-api-types/ignored/puzmo",
-    },
+    settings,
   };
 
   // Test one rando file
@@ -65,7 +61,9 @@ if (import.meta.main) {
 
   const serviceFilesToLookAt = [] as string[];
   for await (
-    const dirEntry of Deno.readDir(appContext.settings.apiServicesPath)
+    const dirEntry of Deno.readDir(
+      appContext.settings.apiServicesPath,
+    )
   ) {
     // These are generally the folders
     if (dirEntry.isDirectory) {
