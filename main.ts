@@ -1,3 +1,5 @@
+//
+
 import { getPrismaSchema, graphql, path, Project } from "./deps.ts";
 
 import { PrismaMap, prismaModeller } from "./prismaModeller.ts";
@@ -24,7 +26,10 @@ const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
 // Mac
 // const redwoodProjectRoot = "/Users/orta/dev/puzmo/site/";
 /// Linux
-const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
+// const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
+
+// Vendored
+const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -43,7 +48,8 @@ if (import.meta.main) {
     prismaDSLPath: path.join(redwoodProjectRoot, "api", "db", "schema.prisma"),
     sharedFilename: "shared-schema-types.d.ts",
     typesFolderRoot:
-      "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
+      // "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
+      "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
   };
 
   await getGraphQLSDLFromFile(settings);
@@ -73,12 +79,16 @@ if (import.meta.main) {
       );
       // And these are the files in them
       for await (const subdirEntry of Deno.readDir(folderPath)) {
-        if (subdirEntry.isFile && subdirEntry.name.endsWith(".ts")) {
+        if (
+          subdirEntry.isFile && subdirEntry.name.endsWith(".ts") && !subdirEntry.name.includes(".test.ts") &&
+          !subdirEntry.name.includes("scenarios.ts")
+        ) {
           serviceFilesToLookAt.push(path.join(folderPath, subdirEntry.name));
         }
       }
     }
   }
+  console.log(serviceFilesToLookAt);
 
   createSharedSchemaFiles(appContext);
 
