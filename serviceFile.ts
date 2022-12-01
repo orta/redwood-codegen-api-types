@@ -1,9 +1,4 @@
-import {
-  capitalizeFirstLetter,
-  createAndReferOrInlineArgsForField,
-  variableDeclarationIsAsync,
-  varStartsWithUppercase,
-} from "./utils.ts";
+import { capitalizeFirstLetter, createAndReferOrInlineArgsForField, variableDeclarationIsAsync, varStartsWithUppercase } from "./utils.ts";
 import { typeMapper } from "./typeMap.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { AppContext } from "./context.ts";
@@ -22,12 +17,8 @@ export const getFileTSInfo = async (file: string, context: AppContext) => {
     fileContents,
   );
 
-  const vars = referenceFileSourceFile.getVariableDeclarations().filter((v) =>
-    v.isExported()
-  );
-  const fns = referenceFileSourceFile.getFunctions().filter((v) =>
-    v.isExported
-  );
+  const vars = referenceFileSourceFile.getVariableDeclarations().filter((v) => v.isExported());
+  const fns = referenceFileSourceFile.getFunctions().filter((v) => v.isExported);
 
   const resolverContainers = vars.filter(varStartsWithUppercase);
 
@@ -63,14 +54,6 @@ export const getFileTSInfo = async (file: string, context: AppContext) => {
     addCustomTypeResolvers(c, {});
   });
 
-  Deno.writeTextFileSync(
-    path.join(
-      context.settings.typesFolderRoot,
-      filename.replace(".ts", ".d.ts"),
-    ),
-    fileDTS.getText(),
-  );
-
   fileDTS.addImportDeclaration({
     isTypeOnly: true,
     moduleSpecifier: "graphql",
@@ -99,11 +82,20 @@ export const getFileTSInfo = async (file: string, context: AppContext) => {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
       moduleSpecifier: "@prisma/client",
-      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) =>
-        `${p} as P${p}`
-      ),
+      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) => `${p} as P${p}`),
     });
   }
+
+  Deno.writeTextFileSync(
+    path.join(
+      context.settings.typesFolderRoot,
+      filename.replace(".ts", ".d.ts"),
+    ),
+    fileDTS.getText(),
+  );
+
+  return;
+
   function addTypeForQueryResolver(
     name: string,
     config: { isAsync: boolean; parentName: string },
@@ -137,21 +129,15 @@ export const getFileTSInfo = async (file: string, context: AppContext) => {
 
     const argsParam = args || "{}";
 
-    const parentType =
-      config.parentName === "Query" || config.parentName === "Mutation"
-        ? "{}"
-        : config.parentName;
+    const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "{}" : config.parentName;
 
     interfaceDeclaration.addCallSignature({
       docs: ["SDL: " + graphql.print(field.astNode!)],
       parameters: [{ name: "args", type: argsParam }, {
         name: "obj",
-        type:
-          `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+        type: `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
       }],
-      returnType: config.isAsync
-        ? `Promise<${map(field.type)}>`
-        : map(field.type),
+      returnType: config.isAsync ? `Promise<${map(field.type)}>` : map(field.type),
     });
   }
 

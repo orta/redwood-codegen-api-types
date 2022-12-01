@@ -1,3 +1,7 @@
+import type { GraphQLResolveInfo } from "graphql";
+import type { CreateGameInput, UpdateGameInput } from "./shared-schema-types.d.ts";
+import type { Game as PGame } from "@prisma/client";
+
 export interface QGames {
     /** SDL: games: [Game!]! */
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PGame[];

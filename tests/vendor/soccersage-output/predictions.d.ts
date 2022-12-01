@@ -1,3 +1,7 @@
+import type { GraphQLResolveInfo } from "graphql";
+import type { StandingsResult, CreatePredictionInput, UpdatePredictionInput } from "./shared-schema-types.d.ts";
+import type { Prediction as PPrediction } from "@prisma/client";
+
 export interface QStandings {
     /** SDL: standings(seasonId: Int!): StandingsResult */
     (args: {seasonId: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): StandingsResult | undefined;

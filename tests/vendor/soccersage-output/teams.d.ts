@@ -1,3 +1,7 @@
+import type { GraphQLResolveInfo } from "graphql";
+import type { CreateTeamInput, UpdateTeamInput } from "./shared-schema-types.d.ts";
+import type { Team as PTeam } from "@prisma/client";
+
 export interface QTeams {
     /** SDL: teams: [Team!]! */
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam[];

@@ -1,3 +1,7 @@
+import type { GraphQLResolveInfo } from "graphql";
+import type { CreateUserInput, UpdateUserInput, SuccessInput } from "./shared-schema-types.d.ts";
+import type { User as PUser } from "@prisma/client";
+
 export interface QUsers {
     /** SDL: users: [User!]! */
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser[];

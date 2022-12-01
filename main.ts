@@ -1,4 +1,6 @@
-//
+// deno run --allow-all --unstable main.ts
+// or watch mode:
+// deno run --allow-all --unstable --watch main.ts
 
 import { getPrismaSchema, graphql, path, Project } from "./deps.ts";
 
@@ -88,7 +90,6 @@ if (import.meta.main) {
       }
     }
   }
-  console.log(serviceFilesToLookAt);
 
   createSharedSchemaFiles(appContext);
 
@@ -96,5 +97,5 @@ if (import.meta.main) {
     await getFileTSInfo(path, appContext);
   }
 
-  console.log(`Updated ${appContext.settings.typesFolderRoot}`);
+  console.log(`Updated`, appContext.settings.typesFolderRoot);
 }

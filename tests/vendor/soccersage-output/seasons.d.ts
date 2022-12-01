@@ -1,3 +1,7 @@
+import type { GraphQLResolveInfo } from "graphql";
+import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types.d.ts";
+import type { Season as PSeason } from "@prisma/client";
+
 export interface QSeasons {
     /** SDL: seasons: [Season!]! */
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason[];

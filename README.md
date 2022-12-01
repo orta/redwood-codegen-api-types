@@ -21,6 +21,7 @@ You can see what it looks like when running on a small, but real, Redwood projec
 
 - Generating a shared library of types for the whole schema (for referencing inside your resolvers)
 - Query / Mutation resolvers are correctly typed
+- Comments from Prisma file, and SDL are included in the generated types
 
 ## TODO
 
