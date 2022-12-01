@@ -12,6 +12,11 @@ ATM it is a deno script, which generates a suite of .d.ts files. With time, I'd 
 
 This is a work in progress, which isn't seeing active use in my main redwood app yet - but it's getting close.
 
+You can see what it looks like when running on a small, but real, Redwood project here:
+
+- [app](tests/vendor/soccersage.io-main)
+- [generated types](tests/vendor/soccersage-output)
+
 ## Done
 
 - Generating a shared library of types for the whole schema (for referencing inside your resolvers)
