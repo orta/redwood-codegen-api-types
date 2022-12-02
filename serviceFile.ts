@@ -190,6 +190,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
       const fields = gqlType.getFields();
 
+      // See:   https://github.com/redwoodjs/redwood/pull/6228#issue-1342966511
+      // For more ideas
       const parentType = fileDTS.addTypeAlias({
         name: `${name}AsParent`,
         type: `P${name} & { ${keys.map((k) => `${k}: () => Promise<${map(fields[k].type)}>`).join(", \n")} }`,
