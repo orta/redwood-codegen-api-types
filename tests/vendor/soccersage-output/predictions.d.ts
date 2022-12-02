@@ -1,4 +1,5 @@
 import type { GraphQLResolveInfo } from "graphql";
+import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
 import type { StandingsResult, CreatePredictionInput, UpdatePredictionInput } from "./shared-schema-types.d.ts";
 import type { Prediction as PPrediction, User as PUser, Team as PTeam, Game as PGame } from "@prisma/client";
 
@@ -37,21 +38,30 @@ export interface MDeletePrediction {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction;
 }
 
+type PredictionAsParent = PPrediction & { id: () => Promise<number>, 
+    teamId: () => Promise<number | undefined>, 
+    gameId: () => Promise<number>, 
+    userId: () => Promise<number>, 
+    prediction: () => Promise<string>, 
+    user: () => Promise<PUser | undefined>, 
+    team: () => Promise<PTeam | undefined>, 
+    game: () => Promise<PGame> };
+
 export interface PredictionResolvers {
     /** SDL: id: Int! */
-    id: () => number;
+    id: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number;
     /** SDL: teamId: Int */
-    teamId: () => number | undefined;
+    teamId: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | undefined;
     /** SDL: gameId: Int! */
-    gameId: () => number;
+    gameId: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number;
     /** SDL: userId: Int! */
-    userId: () => number;
+    userId: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number;
     /** SDL: prediction: String! */
-    prediction: () => string;
+    prediction: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
     /** SDL: user: User */
-    user: () => PUser | undefined;
+    user: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PUser | undefined;
     /** SDL: team: Team */
-    team: () => PTeam | undefined;
+    team: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PTeam | undefined;
     /** SDL: game: Game! */
-    game: () => PGame;
+    game: (args: {}, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PGame;
 }

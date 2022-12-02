@@ -155,8 +155,9 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       .getDeclarations();
 
     declarations.forEach((d) => {
+      const name = d.getName();
       // only do it if the first letter is a capital
-      if (!d.getName().match(/^[A-Z]/)) return;
+      if (!name.match(/^[A-Z]/)) return;
 
       // Grab the const Thing = { ... }
       const obj = d.getFirstDescendantByKind(tsMorph.SyntaxKind.ObjectLiteralExpression);
@@ -171,10 +172,9 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
       // Make an interface
 
-      const resolverInterface = fileDTS.addInterface({
-        name: `${d.getName()}Resolvers`,
-        isExported: true,
-      });
+      // Account: MergePrismaWithSdlTypes<PrismaAccount, MakeRelationsOptional<Account, AllMappedModels>, AllMappedModels>;
+
+      const prismaModel = context.prisma.get(name);
 
       const gqlType = gql.getType(d.getName());
       if (!gqlType) {
@@ -190,20 +190,31 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
       const fields = gqlType.getFields();
 
+      const parentType = fileDTS.addTypeAlias({
+        name: `${name}AsParent`,
+        type: `P${name} & { ${keys.map((k) => `${k}: () => Promise<${map(fields[k].type)}>`).join(", \n")} }`,
+      });
+
+      const resolverInterface = fileDTS.addInterface({
+        name: `${name}Resolvers`,
+        isExported: true,
+      });
+
       keys.forEach((k) => {
         const field = fields[k];
         if (field) {
-          const args = field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ");
+          const args = field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ") || "{}";
+          const innerArgs = `args: ${args}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
 
           resolverInterface.addProperty({
             name: k,
             docs: ["SDL: " + graphql.print(field.astNode!)],
             // parameters: [{ name: "args", type: args }, {
             //   name: "obj",
-            //   type: `{ root: ${d.getName()}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+            //   type: `{ root: ${d.getName()},  }`,
             // }],
             // returnType: map(field.type), // config.isAsync ? `Promise<${map(field.type)}>` : map(field.type),
-            type: `(${args}) => ${map(field.type)}`,
+            type: `(${innerArgs}) => ${map(field.type)}`,
           });
         } else {
           resolverInterface.addCallSignature({ docs: [` @deprecated: SDL ${d.getName()}.${k} does not exist in your schema`] });
@@ -212,3 +223,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     });
   }
 };
+
+// parameters: [{ name: "args", type: argsParam }, {
+//   name: "obj",
+//   type: `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+// }],

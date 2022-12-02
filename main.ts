@@ -28,10 +28,10 @@ const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
 // Mac
 // const redwoodProjectRoot = "/Users/orta/dev/puzmo/site/";
 /// Linux
-const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
+// const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
 
 // Vendored
-// const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
+const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -49,8 +49,8 @@ if (import.meta.main) {
     apiServicesPath: path.join(redwoodProjectRoot, "api", "src", "services"),
     prismaDSLPath: path.join(redwoodProjectRoot, "api", "db", "schema.prisma"),
     sharedFilename: "shared-schema-types.d.ts",
-    typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
-    // "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
+    // typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
+    typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
   };
 
   await getGraphQLSDLFromFile(settings);

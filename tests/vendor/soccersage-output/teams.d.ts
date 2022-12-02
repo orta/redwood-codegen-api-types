@@ -1,4 +1,5 @@
 import type { GraphQLResolveInfo } from "graphql";
+import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
 import type { CreateTeamInput, UpdateTeamInput } from "./shared-schema-types.d.ts";
 import type { Team as PTeam, Prediction as PPrediction, Game as PGame } from "@prisma/client";
 
@@ -27,17 +28,24 @@ export interface MDeleteTeam {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam;
 }
 
+type TeamAsParent = PTeam & { id: () => Promise<number>, 
+    name: () => Promise<string>, 
+    logoUrl: () => Promise<string | undefined>, 
+    Prediction: () => Promise<Array<PPrediction | undefined>>, 
+    homeTeamGames: () => Promise<Array<PGame | undefined>>, 
+    awayTeamGames: () => Promise<Array<PGame | undefined>> };
+
 export interface TeamResolvers {
     /** SDL: id: Int! */
-    id: () => number;
+    id: (args: {}, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number;
     /** SDL: name: String! */
-    name: () => string;
+    name: (args: {}, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
     /** SDL: logoUrl: String */
-    logoUrl: () => string | undefined;
+    logoUrl: (args: {}, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | undefined;
     /** SDL: Prediction: [Prediction]! */
-    Prediction: () => Array<PPrediction | undefined>;
+    Prediction: (args: {}, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction | undefined>;
     /** SDL: homeTeamGames: [Game]! */
-    homeTeamGames: () => Array<PGame | undefined>;
+    homeTeamGames: (args: {}, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PGame | undefined>;
     /** SDL: awayTeamGames: [Game]! */
-    awayTeamGames: () => Array<PGame | undefined>;
+    awayTeamGames: (args: {}, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PGame | undefined>;
 }
