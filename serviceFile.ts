@@ -60,6 +60,12 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     namedImports: ["GraphQLResolveInfo"],
   });
 
+  fileDTS.addImportDeclaration({
+    isTypeOnly: true,
+    moduleSpecifier: "@redwoodjs/graphql-server/dist/functions/types",
+    namedImports: ["RedwoodGraphQLContext"],
+  });
+
   const sharedGraphQLObjectsReferenced = getReferencedGraphQLThingsInMapping();
   if (sharedGraphQLObjectsReferenced.types.length) {
     fileDTS.addImportDeclaration({
