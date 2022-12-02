@@ -3,7 +3,7 @@ import { typeMapper } from "./typeMap.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { AppContext } from "./context.ts";
 
-export const getFileTSInfo = async (file: string, context: AppContext) => {
+export const lookAtServiceFile = async (file: string, context: AppContext) => {
   const { gql, prisma, tsProject, settings } = context;
 
   if (!gql) throw new Error("No schema");
@@ -148,6 +148,61 @@ export const getFileTSInfo = async (file: string, context: AppContext) => {
     const declarations = variableDeclaration.getVariableStatementOrThrow()
       .getDeclarations();
 
-    console.log(declarations.map((d) => d.getName()));
+    declarations.forEach((d) => {
+      // only do it if the first letter is a capital
+      if (!d.getName().match(/^[A-Z]/)) return;
+
+      // Grab the const Thing = { ... }
+      const obj = d.getFirstDescendantByKind(tsMorph.SyntaxKind.ObjectLiteralExpression);
+      if (!obj) throw new Error(`Could not find an object literal ( e.g. a { } ) in ${d.getName()}`);
+
+      // Get a list of the defined keys
+      const keys: string[] = [];
+      obj.getProperties().forEach((p) => {
+        if (p.isKind(tsMorph.SyntaxKind.PropertyAssignment)) keys.push(p.getName());
+        if (p.isKind(tsMorph.SyntaxKind.FunctionDeclaration) && p.getName()) keys.push(p.getName()!);
+      });
+
+      // Make an interface
+
+      const resolverInterface = fileDTS.addInterface({
+        name: `${d.getName()}Resolvers`,
+        isExported: true,
+      });
+
+      const gqlType = gql.getType(d.getName());
+      if (!gqlType) {
+        // throw new Error(`Could not find a GraphQL type named ${d.getName()}`);
+        fileDTS.addStatements(
+          `\n// ${d.getName()} does not exist in the schema`,
+        );
+        return;
+      }
+      if (!graphql.isObjectType(gqlType)) {
+        throw new Error(`In your schema ${d.getName()} is not an object, which we can only make resolver types for`);
+      }
+
+      const fields = gqlType.getFields();
+
+      keys.forEach((k) => {
+        const field = fields[k];
+        if (field) {
+          const args = field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ");
+
+          resolverInterface.addProperty({
+            name: k,
+            docs: ["SDL: " + graphql.print(field.astNode!)],
+            // parameters: [{ name: "args", type: args }, {
+            //   name: "obj",
+            //   type: `{ root: ${d.getName()}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+            // }],
+            // returnType: map(field.type), // config.isAsync ? `Promise<${map(field.type)}>` : map(field.type),
+            type: `(${args}) => ${map(field.type)}`,
+          });
+        } else {
+          resolverInterface.addCallSignature({ docs: [` @deprecated: SDL ${d.getName()}.${k} does not exist in your schema`] });
+        }
+      });
+    });
   }
 };

@@ -1,6 +1,6 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { StandingsResult, CreatePredictionInput, UpdatePredictionInput } from "./shared-schema-types.d.ts";
-import type { Prediction as PPrediction } from "@prisma/client";
+import type { Prediction as PPrediction, User as PUser, Team as PTeam, Game as PGame } from "@prisma/client";
 
 export interface QStandings {
     /** SDL: standings(seasonId: Int!): StandingsResult */
@@ -35,4 +35,23 @@ export interface MUpdatePrediction {
 export interface MDeletePrediction {
     /** SDL: deletePrediction(id: Int!): Prediction! */
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction;
+}
+
+export interface PredictionResolvers {
+    /** SDL: id: Int! */
+    id: () => number;
+    /** SDL: teamId: Int */
+    teamId: () => number | undefined;
+    /** SDL: gameId: Int! */
+    gameId: () => number;
+    /** SDL: userId: Int! */
+    userId: () => number;
+    /** SDL: prediction: String! */
+    prediction: () => string;
+    /** SDL: user: User */
+    user: () => PUser | undefined;
+    /** SDL: team: Team */
+    team: () => PTeam | undefined;
+    /** SDL: game: Game! */
+    game: () => PGame;
 }

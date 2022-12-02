@@ -22,9 +22,9 @@ You can see what it looks like when running on a small, but real, Redwood projec
 - Generating a shared library of types for the whole schema (for referencing inside your resolvers)
 - Query / Mutation resolvers are correctly typed
 - Comments from Prisma file, and SDL are included in the generated types
+- Resolvers on specific models need to be added
 
 ## TODO
 
-- Resolvers on specific models need to be added
 - Types for things like parents need to take into account known resolvers which are declared in a service, and force them to be optional
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )

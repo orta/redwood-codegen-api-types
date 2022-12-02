@@ -7,7 +7,7 @@ import { getPrismaSchema, graphql, path, Project } from "./deps.ts";
 import { PrismaMap, prismaModeller } from "./prismaModeller.ts";
 import { createSharedSchemaFiles } from "./sharedSchema.ts";
 import { AppContext } from "./context.ts";
-import { getFileTSInfo } from "./serviceFile.ts";
+import { lookAtServiceFile } from "./serviceFile.ts";
 
 let gqlSchema: graphql.GraphQLSchema | undefined;
 const getGraphQLSDLFromFile = async (settings: AppContext["settings"]) => {
@@ -28,10 +28,10 @@ const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
 // Mac
 // const redwoodProjectRoot = "/Users/orta/dev/puzmo/site/";
 /// Linux
-// const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
+const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
 
 // Vendored
-const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
+// const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -49,9 +49,8 @@ if (import.meta.main) {
     apiServicesPath: path.join(redwoodProjectRoot, "api", "src", "services"),
     prismaDSLPath: path.join(redwoodProjectRoot, "api", "db", "schema.prisma"),
     sharedFilename: "shared-schema-types.d.ts",
-    typesFolderRoot:
-      // "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
-      "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
+    typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
+    // "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
   };
 
   await getGraphQLSDLFromFile(settings);
@@ -91,10 +90,17 @@ if (import.meta.main) {
     }
   }
 
+  // empty the types folder
+  for await (const dirEntry of Deno.readDir(appContext.settings.typesFolderRoot)) {
+    if (dirEntry.isFile) {
+      await Deno.remove(path.join(appContext.settings.typesFolderRoot, dirEntry.name));
+    }
+  }
+
   createSharedSchemaFiles(appContext);
 
   for (const path of serviceFilesToLookAt) {
-    await getFileTSInfo(path, appContext);
+    await lookAtServiceFile(path, appContext);
   }
 
   console.log(`Updated`, appContext.settings.typesFolderRoot);

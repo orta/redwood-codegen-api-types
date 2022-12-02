@@ -1,6 +1,6 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { CreateTeamInput, UpdateTeamInput } from "./shared-schema-types.d.ts";
-import type { Team as PTeam } from "@prisma/client";
+import type { Team as PTeam, Prediction as PPrediction, Game as PGame } from "@prisma/client";
 
 export interface QTeams {
     /** SDL: teams: [Team!]! */
@@ -25,4 +25,19 @@ export interface MUpdateTeam {
 export interface MDeleteTeam {
     /** SDL: deleteTeam(id: Int!): Team! */
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam;
+}
+
+export interface TeamResolvers {
+    /** SDL: id: Int! */
+    id: () => number;
+    /** SDL: name: String! */
+    name: () => string;
+    /** SDL: logoUrl: String */
+    logoUrl: () => string | undefined;
+    /** SDL: Prediction: [Prediction]! */
+    Prediction: () => Array<PPrediction | undefined>;
+    /** SDL: homeTeamGames: [Game]! */
+    homeTeamGames: () => Array<PGame | undefined>;
+    /** SDL: awayTeamGames: [Game]! */
+    awayTeamGames: () => Array<PGame | undefined>;
 }

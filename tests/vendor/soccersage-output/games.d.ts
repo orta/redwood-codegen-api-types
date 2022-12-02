@@ -1,6 +1,6 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { CreateGameInput, UpdateGameInput } from "./shared-schema-types.d.ts";
-import type { Game as PGame } from "@prisma/client";
+import type { Game as PGame, Prediction as PPrediction, Team as PTeam, Season as PSeason } from "@prisma/client";
 
 export interface QGames {
     /** SDL: games: [Game!]! */
@@ -31,3 +31,32 @@ export interface MDeleteGame {
     /** SDL: deleteGame(id: Int!): Game! */
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PGame;
 }
+
+export interface GameResolvers {
+    /** SDL: id: Int! */
+    id: () => number;
+    /** SDL: seasonId: Int! */
+    seasonId: () => number;
+    /** SDL: awayTeamId: Int! */
+    awayTeamId: () => number;
+    /** SDL: homeTeamId: Int! */
+    homeTeamId: () => number;
+    /** SDL: awayTeamScore: Int */
+    awayTeamScore: () => number | undefined;
+    /** SDL: homeTeamScore: Int */
+    homeTeamScore: () => number | undefined;
+    /** SDL: isCompleted: Boolean! */
+    isCompleted: () => boolean;
+    /** SDL: startDateTime: DateTime! */
+    startDateTime: () => DateTime;
+    /** SDL: predictions: [Prediction]! */
+    predictions: () => Array<PPrediction | undefined>;
+    /** SDL: homeTeam: Team! */
+    homeTeam: () => PTeam;
+    /** SDL: awayTeam: Team! */
+    awayTeam: () => PTeam;
+    /** SDL: season: Season! */
+    season: () => PSeason;
+}
+
+type DateTime = any;

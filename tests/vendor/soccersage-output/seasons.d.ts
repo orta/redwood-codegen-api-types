@@ -1,6 +1,6 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types.d.ts";
-import type { Season as PSeason } from "@prisma/client";
+import type { Season as PSeason, Prediction as PPrediction } from "@prisma/client";
 
 export interface QSeasons {
     /** SDL: seasons: [Season!]! */
@@ -26,3 +26,18 @@ export interface MDeleteSeason {
     /** SDL: deleteSeason(id: Int!): Season! */
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason;
 }
+
+export interface SeasonResolvers {
+    /** SDL: id: Int! */
+    id: () => number;
+    /** SDL: name: String! */
+    name: () => string;
+    /** SDL: startDate: DateTime! */
+    startDate: () => DateTime;
+    /** SDL: endDate: DateTime! */
+    endDate: () => DateTime;
+    /** SDL: Prediction: [Prediction]! */
+    Prediction: () => Array<PPrediction | undefined>;
+}
+
+type DateTime = any;
