@@ -6,6 +6,37 @@ This... is a mixed bag, I'm reasonably sure that the runtime code is right but I
 
 So, this project is what I have been referring to as 'relay style' types codegen, where each service in the Redwood project gets its own `.d.ts` file which is hyper specific - taking into account the resolvers defined, the GraphQL schema and the types from Prisma.
 
+I like to think of it as taking all of the work inside types like:
+
+```graphql
+export type AccountRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = {
+    createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+    email?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+    users?: RequiredResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType>;
+}
+
+export type ResolversParentTypes = {
+  Account: MergePrismaWithSdlTypes<PrismaAccount, MakeRelationsOptional<Account, AllMappedModels>, AllMappedModels>;
+}
+
+// ...
+```
+
+and bakes it down to the end results instead:
+
+```gql
+type AccountAsParent = PAccount & { users: () => Promise<PUser[]> };
+
+export interface AccountResolvers {
+    /** SDL: users: [User!]! */
+    users: (args: {}, obj: { root: AccountAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PUser[];
+}
+```
+
+Obviously this is considerably less flexible than before, but the goal is to be exactly what I need for my large Redwood project and then maybe if folks are interested we can collab on making it more flexible.
+
+---
+
 ATM it is a deno script, which generates a suite of .d.ts files. With time, I'd expect it to trigger a runtime server which uses watchman to incrementally update your types as your app changes.
 
 ---
