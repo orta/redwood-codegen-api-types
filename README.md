@@ -6,7 +6,7 @@ This... is a mixed bag, I'm reasonably sure that the runtime code is right but I
 
 So, this project is what I have been referring to as 'relay style' types codegen, where each service in the Redwood project gets its own `.d.ts` file which is hyper specific - taking into account the resolvers defined, the GraphQL schema and the types from Prisma.
 
-I like to think of it as taking all of the work inside types like:
+I like to think of it as taking all of the work which happens in the type system, from types like:
 
 ```graphql
 export type AccountRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = {
@@ -22,7 +22,7 @@ export type ResolversParentTypes = {
 // ...
 ```
 
-and bakes it down to the end results instead:
+and manually applies them, with an understanding of how redwood works to just be the results:
 
 ```gql
 type AccountAsParent = PAccount & { users: () => Promise<PUser[]> };
@@ -33,7 +33,9 @@ export interface AccountResolvers {
 }
 ```
 
-Obviously this is considerably less flexible than before, but the goal is to be exactly what I need for my large Redwood project and then maybe if folks are interested we can collab on making it more flexible.
+Obviously this is considerably less flexible than before, but the goal is to be exactly what I need for my large Redwood project and then if folks are interested in the same problems, we can collab on making it more flexible.
+
+I'm not really sure it makes sense for the Redwood team to think about upstreaming the changes, mainly because there's a bunch of codebases out there with all sorts of edge cases - and I don't have time to deal with other people's edge cases.
 
 ---
 
