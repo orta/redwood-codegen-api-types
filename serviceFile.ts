@@ -1,12 +1,8 @@
-import {
-  capitalizeFirstLetter,
-  createAndReferOrInlineArgsForField,
-  variableDeclarationIsAsync,
-  varStartsWithUppercase,
-} from "./utils.ts";
+import { capitalizeFirstLetter, createAndReferOrInlineArgsForField, variableDeclarationIsAsync, varStartsWithUppercase } from "./utils.ts";
 import { typeMapper } from "./typeMap.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { AppContext } from "./context.ts";
+import { FieldFact, FieldFacts } from "./typeFacts.ts";
 
 export const lookAtServiceFile = async (file: string, context: AppContext) => {
   const { gql, prisma, tsProject, settings } = context;
@@ -22,9 +18,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     fileContents,
   );
 
-  const vars = referenceFileSourceFile.getVariableDeclarations().filter((v) =>
-    v.isExported()
-  );
+  const vars = referenceFileSourceFile.getVariableDeclarations().filter((v) => v.isExported());
 
   const resolverContainers = vars.filter(varStartsWithUppercase);
 
@@ -94,9 +88,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
       moduleSpecifier: "@prisma/client",
-      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) =>
-        `${p} as P${p}`
-      ),
+      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) => `${p} as P${p}`),
     });
   }
 
@@ -144,20 +136,15 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
     const argsParam = args || "{}";
 
-    const parentType =
-      config.parentName === "Query" || config.parentName === "Mutation"
-        ? "{}"
-        : config.parentName;
+    const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "{}" : config.parentName;
 
     const tType = map(field.type);
-    const returnType =
-      `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
+    const returnType = `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
 
     interfaceDeclaration.addCallSignature({
       parameters: [{ name: "args", type: argsParam }, {
         name: "obj",
-        type:
-          `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+        type: `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
       }],
       returnType,
     });
@@ -174,6 +161,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       const name = d.getName();
       // only do it if the first letter is a capital
       if (!name.match(/^[A-Z]/)) return;
+
+      const fieldFacts: FieldFacts = {};
 
       // Grab the const Thing = { ... }
       const obj = d.getFirstDescendantByKind(
@@ -237,15 +226,15 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       keys.forEach((k) => {
         const field = fields[k];
         if (field) {
+          if (fieldFacts[k]) fieldFacts[k].hasResolverImplementation = true;
+          else fieldFacts[k] = { hasResolverImplementation: true };
+
           const argsType = field.args?.length
             // Always use an args obj
-            ? `{${
-              field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ")
-            }}`
+            ? `{${field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ")}}`
             : undefined;
 
-          const innerArgs =
-            `args: ${argsType}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
+          const innerArgs = `args: ${argsType}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
 
           const returnType = `Promise<${map(field.type)}> | ${map(field.type)}`;
           resolverInterface.addProperty({
@@ -266,6 +255,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
           });
         }
       });
+
+      context.fieldFacts.set(d.getName(), fieldFacts);
     });
   }
 };

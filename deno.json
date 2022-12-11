@@ -3,5 +3,8 @@
     "options": {
       "lineWidth": 140
     }
+  },
+  "tasks": {
+    "dev": "deno run --allow-all --unstable --watch main.ts"
   }
 }

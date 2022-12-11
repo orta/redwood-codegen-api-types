@@ -1,12 +1,12 @@
 /// The main schema for objects and inputs
 
 import { AppContext } from "./context.ts";
-import { graphql, path } from "./deps.ts";
+import { graphql, path, tsMorph } from "./deps.ts";
 import { typeMapper } from "./typeMap.ts";
 
 export const createSharedSchemaFiles = (context: AppContext) => {
   // We want to make a file with everything except Query and Mutation in it.
-  const { gql, prisma, tsProject, settings } = context;
+  const { gql, prisma, fieldFacts } = context;
 
   const types = gql.getTypeMap();
   const knownPrimitives = ["String", "Boolean", "Int"];
@@ -38,20 +38,23 @@ export const createSharedSchemaFiles = (context: AppContext) => {
         name: type.name,
         isExported: true,
         docs: [],
-        properties: Object.entries(type.getFields()).map(([name, obj]) => {
+        properties: Object.entries(type.getFields()).map(([fieldName, obj]) => {
           const docs = [];
-          const prismaField = pType?.properties.get(name);
+          const prismaField = pType?.properties.get(fieldName);
 
           if (prismaField && prismaField.leadingComments.length) {
             docs.push(prismaField.leadingComments.trim());
           }
           // if (obj.description) docs.push(obj.description);
+          const optional = fieldFacts.get(name)?.[fieldName]?.hasResolverImplementation;
 
-          return {
-            name,
+          const field: tsMorph.OptionalKind<tsMorph.PropertySignatureStructure> = {
+            name: fieldName,
             type: mapper.map(obj.type),
             docs,
+            hasQuestionToken: optional,
           };
+          return field;
         }),
       });
     }

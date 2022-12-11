@@ -4,7 +4,7 @@
 //     GameResolvers,
 // } from 'types/graphql';
 
-import type { QGames } from "../../../../../soccersage-output/games.d.ts";
+import type { MCreateGame, MDeleteGame, MUpdateGame, QGame, QGames, QUpcomingGames } from "../../../../../soccersage-output/games.d.ts";
 
 import { db } from "src/lib/db";
 
@@ -16,32 +16,32 @@ export const games: QGames = (args, obj) => {
   });
 };
 
-export const upcomingGames: QueryResolvers["upcomingGames"] = () => {
+export const upcomingGames: QUpcomingGames = () => {
   return db.game.findMany({
     where: { isCompleted: false, startDateTime: { gt: new Date() } },
   });
 };
 
-export const game: QueryResolvers["game"] = ({ id }) => {
+export const game: QGame = ({ id }) => {
   return db.game.findUnique({
     where: { id },
   });
 };
 
-export const createGame: MutationResolvers["createGame"] = ({ input }) => {
+export const createGame: MCreateGame = ({ input }) => {
   return db.game.create({
     data: input,
   });
 };
 
-export const updateGame: MutationResolvers["updateGame"] = ({ id, input }) => {
+export const updateGame: MUpdateGame = ({ id, input }) => {
   return db.game.update({
     data: input,
     where: { id },
   });
 };
 
-export const deleteGame: MutationResolvers["deleteGame"] = async ({ id }) => {
+export const deleteGame: MDeleteGame = async ({ id }) => {
   await db.prediction.deleteMany({
     where: { gameId: id },
   });
@@ -52,14 +52,6 @@ export const deleteGame: MutationResolvers["deleteGame"] = async ({ id }) => {
 };
 
 export const Game: GameResolvers = {
-  id: (_obj, { root }) => root.id,
-  seasonId: (_obj, { root }) => root.seasonId,
-  awayTeamId: (_obj, { root }) => root.awayTeamId,
-  homeTeamId: (_obj, { root }) => root.homeTeamId,
-  awayTeamScore: (_obj, { root }) => root.awayTeamScore,
-  homeTeamScore: (_obj, { root }) => root.homeTeamScore,
-  isCompleted: (_obj, { root }) => root.isCompleted,
-  startDateTime: (_obj, { root }) => root.startDateTime,
   predictions: (_obj, { root }) => db.game.findUnique({ where: { id: root.id } }).predictions(),
   homeTeam: (_obj, { root }) => db.game.findUnique({ where: { id: root.id } }).homeTeam(),
   awayTeam: (_obj, { root }) => db.game.findUnique({ where: { id: root.id } }).awayTeam(),

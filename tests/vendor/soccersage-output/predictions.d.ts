@@ -3,39 +3,39 @@ import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/funct
 import type { StandingsResult, CreatePredictionInput, UpdatePredictionInput } from "./shared-schema-types";
 import type { Prediction as PPrediction, User as PUser, Team as PTeam, Game as PGame } from "@prisma/client";
 
+/** SDL: standings(seasonId: Int!): StandingsResult */
 export interface QStandings {
-    /** SDL: standings(seasonId: Int!): StandingsResult */
-    (args: {seasonId: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): StandingsResult | undefined | Promise<StandingsResult | undefined> | () => Promise<StandingsResult | undefined> ;
+    (args: {seasonId: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): StandingsResult | undefined | Promise<StandingsResult | undefined> | (() => Promise<StandingsResult | undefined>);
 }
 
+/** SDL: predictions: [Prediction!]! */
 export interface QPredictions {
-    /** SDL: predictions: [Prediction!]! */
-    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | () => Promise<PPrediction[]> ;
+    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | (() => Promise<PPrediction[]>);
 }
 
+/** SDL: myPredictions: [Prediction!]! */
 export interface QMyPredictions {
-    /** SDL: myPredictions: [Prediction!]! */
-    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | () => Promise<PPrediction[]> ;
+    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | (() => Promise<PPrediction[]>);
 }
 
+/** SDL: prediction(id: Int!): Prediction */
 export interface QPrediction {
-    /** SDL: prediction(id: Int!): Prediction */
-    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | undefined | Promise<PPrediction | undefined> | () => Promise<PPrediction | undefined> ;
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | undefined | Promise<PPrediction | undefined> | (() => Promise<PPrediction | undefined>);
 }
 
+/** SDL: createPrediction(input: CreatePredictionInput!): Prediction! */
 export interface MCreatePrediction {
-    /** SDL: createPrediction(input: CreatePredictionInput!): Prediction! */
-    (args: {input: CreatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | () => Promise<PPrediction> ;
+    (args: {input: CreatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | (() => Promise<PPrediction>);
 }
 
+/** SDL: updatePrediction(id: Int!, input: UpdatePredictionInput!): Prediction! */
 export interface MUpdatePrediction {
-    /** SDL: updatePrediction(id: Int!, input: UpdatePredictionInput!): Prediction! */
-    (args: {id: number, input: UpdatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | () => Promise<PPrediction> ;
+    (args: {id: number, input: UpdatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | (() => Promise<PPrediction>);
 }
 
+/** SDL: deletePrediction(id: Int!): Prediction! */
 export interface MDeletePrediction {
-    /** SDL: deletePrediction(id: Int!): Prediction! */
-    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | () => Promise<PPrediction> ;
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | (() => Promise<PPrediction>);
 }
 
 type PredictionAsParent = PPrediction & { id: () => Promise<number>, 

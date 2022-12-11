@@ -50,16 +50,32 @@ You can see what it looks like when running on a small, but real, Redwood projec
 - [app](tests/vendor/soccersage.io-main)
 - [generated types](tests/vendor/soccersage-output)
 
+## How to work in this repo
+
+- Install deno
+- Clone the repo
+- Run `deno task dev` to start the dev server
+
+The dev server will re-run against the fixtures in `tests/vendor`, you can use git to work with the diff.
+
+You can make a `.env` in the root, and the dev server will _also_ run against these paths:
+
+```
+MAIN_APP_PATH="/home/orta/dev/app/"
+MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
+```
+
 ## Done
 
 - Generating a shared library of types for the whole schema (for referencing inside your resolvers)
 - Query / Mutation resolvers are correctly typed
 - Comments from Prisma file, and SDL are included in the generated types
 - Resolvers on specific models need to be added
+- Create an internal representation of a GQL type which adds an optional marker to resolvers defined in the file.
 
 ## TODO
 
-- Create an internal and external representation of the shared schema, the internal representation would take into account resolvers defined in the file as being optional.
 - Feel good that all [these types](https://github.com/redwoodjs/redwood/pull/6228) are accounted for
 - Types for things like parents need to take into account known resolvers which are declared in a service, and force them to be optional
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )
+- Create an 'unuused resolvers' interface for auto-complete on the main type resolvers?
