@@ -1,4 +1,9 @@
-import { capitalizeFirstLetter, createAndReferOrInlineArgsForField, variableDeclarationIsAsync, varStartsWithUppercase } from "./utils.ts";
+import {
+  capitalizeFirstLetter,
+  createAndReferOrInlineArgsForField,
+  variableDeclarationIsAsync,
+  varStartsWithUppercase,
+} from "./utils.ts";
 import { typeMapper } from "./typeMap.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { AppContext } from "./context.ts";
@@ -17,8 +22,9 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     fileContents,
   );
 
-  const vars = referenceFileSourceFile.getVariableDeclarations().filter((v) => v.isExported());
-  const fns = referenceFileSourceFile.getFunctions().filter((v) => v.isExported);
+  const vars = referenceFileSourceFile.getVariableDeclarations().filter((v) =>
+    v.isExported()
+  );
 
   const resolverContainers = vars.filter(varStartsWithUppercase);
 
@@ -70,7 +76,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
   if (sharedGraphQLObjectsReferenced.types.length) {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
-      moduleSpecifier: `./${settings.sharedFilename}`,
+      moduleSpecifier: `./${settings.sharedFilename.replace(".d.ts", "")}`,
       namedImports: sharedGraphQLObjectsReferenced.types,
     });
   }
@@ -88,7 +94,9 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
       moduleSpecifier: "@prisma/client",
-      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) => `${p} as P${p}`),
+      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) =>
+        `${p} as P${p}`
+      ),
     });
   }
 
@@ -135,15 +143,21 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
     const argsParam = args || "{}";
 
-    const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "{}" : config.parentName;
+    const parentType =
+      config.parentName === "Query" || config.parentName === "Mutation"
+        ? "{}"
+        : config.parentName;
 
     interfaceDeclaration.addCallSignature({
       docs: ["SDL: " + graphql.print(field.astNode!)],
       parameters: [{ name: "args", type: argsParam }, {
         name: "obj",
-        type: `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+        type:
+          `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
       }],
-      returnType: config.isAsync ? `Promise<${map(field.type)}>` : map(field.type),
+      returnType: config.isAsync
+        ? `Promise<${map(field.type)}>`
+        : map(field.type),
     });
   }
 
@@ -160,14 +174,24 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       if (!name.match(/^[A-Z]/)) return;
 
       // Grab the const Thing = { ... }
-      const obj = d.getFirstDescendantByKind(tsMorph.SyntaxKind.ObjectLiteralExpression);
-      if (!obj) throw new Error(`Could not find an object literal ( e.g. a { } ) in ${d.getName()}`);
+      const obj = d.getFirstDescendantByKind(
+        tsMorph.SyntaxKind.ObjectLiteralExpression,
+      );
+      if (!obj) {
+        throw new Error(
+          `Could not find an object literal ( e.g. a { } ) in ${d.getName()}`,
+        );
+      }
 
       // Get a list of the defined keys
       const keys: string[] = [];
       obj.getProperties().forEach((p) => {
-        if (p.isKind(tsMorph.SyntaxKind.PropertyAssignment)) keys.push(p.getName());
-        if (p.isKind(tsMorph.SyntaxKind.FunctionDeclaration) && p.getName()) keys.push(p.getName()!);
+        if (p.isKind(tsMorph.SyntaxKind.PropertyAssignment)) {
+          keys.push(p.getName());
+        }
+        if (p.isKind(tsMorph.SyntaxKind.FunctionDeclaration) && p.getName()) {
+          keys.push(p.getName()!);
+        }
       });
 
       // Make an interface
@@ -185,7 +209,9 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
         return;
       }
       if (!graphql.isObjectType(gqlType)) {
-        throw new Error(`In your schema ${d.getName()} is not an object, which we can only make resolver types for`);
+        throw new Error(
+          `In your schema ${d.getName()} is not an object, which we can only make resolver types for`,
+        );
       }
 
       const fields = gqlType.getFields();
@@ -194,7 +220,11 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       // For more ideas
       const parentType = fileDTS.addTypeAlias({
         name: `${name}AsParent`,
-        type: `P${name} & { ${keys.map((k) => `${k}: () => Promise<${map(fields[k].type)}>`).join(", \n")} }`,
+        type: `P${name} & { ${
+          keys.map((k) => `${k}: () => Promise<${map(fields[k].type)}>`).join(
+            ", \n",
+          )
+        } }`,
       });
 
       const resolverInterface = fileDTS.addInterface({
@@ -205,9 +235,17 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       keys.forEach((k) => {
         const field = fields[k];
         if (field) {
-          const args = field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ") || "{}";
-          const innerArgs = `args: ${args}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
+          const argsType = field.args?.length
+            // Always use an args obj
+            ? `{${
+              field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ")
+            }}`
+            : undefined;
 
+          const innerArgs =
+            `args: ${argsType}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
+
+          const returnType = `Promise<${map(field.type)}> | ${map(field.type)}`;
           resolverInterface.addProperty({
             name: k,
             docs: ["SDL: " + graphql.print(field.astNode!)],
@@ -216,10 +254,14 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
             //   type: `{ root: ${d.getName()},  }`,
             // }],
             // returnType: map(field.type), // config.isAsync ? `Promise<${map(field.type)}>` : map(field.type),
-            type: `(${innerArgs}) => ${map(field.type)}`,
+            type: `(${innerArgs}) => ${returnType}`,
           });
         } else {
-          resolverInterface.addCallSignature({ docs: [` @deprecated: SDL ${d.getName()}.${k} does not exist in your schema`] });
+          resolverInterface.addCallSignature({
+            docs: [
+              ` @deprecated: SDL ${d.getName()}.${k} does not exist in your schema`,
+            ],
+          });
         }
       });
     });

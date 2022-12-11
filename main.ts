@@ -26,12 +26,12 @@ const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
 };
 
 // Mac
-// const redwoodProjectRoot = "/Users/orta/dev/puzmo/site/";
+const redwoodProjectRoot = "/Users/orta/dev/puzmo/";
 /// Linux
 // const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
 
 // Vendored
-const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
+// const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -49,8 +49,9 @@ if (import.meta.main) {
     apiServicesPath: path.join(redwoodProjectRoot, "api", "src", "services"),
     prismaDSLPath: path.join(redwoodProjectRoot, "api", "db", "schema.prisma"),
     sharedFilename: "shared-schema-types.d.ts",
-    // typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/ignored/puzmo",
-    typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
+    // typesFolderRoot: "/Users/orta/dev/redwood-codegen-api-types/ignored/puzmo",
+    // typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
+    typesFolderRoot: "/Users/orta/dev/puzmo/api/src/lib/types",
   };
 
   await getGraphQLSDLFromFile(settings);
@@ -81,7 +82,8 @@ if (import.meta.main) {
       // And these are the files in them
       for await (const subdirEntry of Deno.readDir(folderPath)) {
         if (
-          subdirEntry.isFile && subdirEntry.name.endsWith(".ts") && !subdirEntry.name.includes(".test.ts") &&
+          subdirEntry.isFile && subdirEntry.name.endsWith(".ts") &&
+          !subdirEntry.name.includes(".test.ts") &&
           !subdirEntry.name.includes("scenarios.ts")
         ) {
           serviceFilesToLookAt.push(path.join(folderPath, subdirEntry.name));
@@ -91,9 +93,13 @@ if (import.meta.main) {
   }
 
   // empty the types folder
-  for await (const dirEntry of Deno.readDir(appContext.settings.typesFolderRoot)) {
+  for await (
+    const dirEntry of Deno.readDir(appContext.settings.typesFolderRoot)
+  ) {
     if (dirEntry.isFile) {
-      await Deno.remove(path.join(appContext.settings.typesFolderRoot, dirEntry.name));
+      await Deno.remove(
+        path.join(appContext.settings.typesFolderRoot, dirEntry.name),
+      );
     }
   }
 
