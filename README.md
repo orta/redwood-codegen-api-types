@@ -29,7 +29,7 @@ type AccountAsParent = PAccount & { users: () => Promise<PUser[]> };
 
 export interface AccountResolvers {
     /** SDL: users: [User!]! */
-    users: (args: {}, obj: { root: AccountAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PUser[];
+    users: (args: {}, obj: { root: AccountAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PUser[] | Promise<PUser[]>;
 }
 ```
 
