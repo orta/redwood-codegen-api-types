@@ -133,6 +133,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     const interfaceDeclaration = fileDTS.addInterface({
       name: `${prefix}${capitalizeFirstLetter(name)}`,
       isExported: true,
+      docs: ["SDL: " + graphql.print(field.astNode!)],
     });
 
     const args = createAndReferOrInlineArgsForField(field, {
@@ -148,16 +149,17 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
         ? "{}"
         : config.parentName;
 
+    const tType = map(field.type);
+    const returnType =
+      `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
+
     interfaceDeclaration.addCallSignature({
-      docs: ["SDL: " + graphql.print(field.astNode!)],
       parameters: [{ name: "args", type: argsParam }, {
         name: "obj",
         type:
           `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
       }],
-      returnType: config.isAsync
-        ? `Promise<${map(field.type)}>`
-        : map(field.type),
+      returnType,
     });
   }
 

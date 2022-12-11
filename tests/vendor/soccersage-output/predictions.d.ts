@@ -5,37 +5,37 @@ import type { Prediction as PPrediction, User as PUser, Team as PTeam, Game as P
 
 export interface QStandings {
     /** SDL: standings(seasonId: Int!): StandingsResult */
-    (args: {seasonId: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): StandingsResult | undefined;
+    (args: {seasonId: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): StandingsResult | undefined | Promise<StandingsResult | undefined> | () => Promise<StandingsResult | undefined> ;
 }
 
 export interface QPredictions {
     /** SDL: predictions: [Prediction!]! */
-    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[];
+    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | () => Promise<PPrediction[]> ;
 }
 
 export interface QMyPredictions {
     /** SDL: myPredictions: [Prediction!]! */
-    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[];
+    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | () => Promise<PPrediction[]> ;
 }
 
 export interface QPrediction {
     /** SDL: prediction(id: Int!): Prediction */
-    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | undefined;
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | undefined | Promise<PPrediction | undefined> | () => Promise<PPrediction | undefined> ;
 }
 
 export interface MCreatePrediction {
     /** SDL: createPrediction(input: CreatePredictionInput!): Prediction! */
-    (args: {input: CreatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction;
+    (args: {input: CreatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | () => Promise<PPrediction> ;
 }
 
 export interface MUpdatePrediction {
     /** SDL: updatePrediction(id: Int!, input: UpdatePredictionInput!): Prediction! */
-    (args: {id: number, input: UpdatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction;
+    (args: {id: number, input: UpdatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | () => Promise<PPrediction> ;
 }
 
 export interface MDeletePrediction {
     /** SDL: deletePrediction(id: Int!): Prediction! */
-    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction;
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | () => Promise<PPrediction> ;
 }
 
 type PredictionAsParent = PPrediction & { id: () => Promise<number>, 

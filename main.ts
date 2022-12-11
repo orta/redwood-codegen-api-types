@@ -27,22 +27,22 @@ const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
 
 // FROM:
 // Mac
-// const redwoodProjectRoot = "/Users/orta/dev/puzmo/";
+const redwoodProjectRoot = "/Users/orta/dev/puzmo/";
 /// Linux
 // const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
 
 // Vendored
-const redwoodProjectRoot =
-  "/Users/orta/dev/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
+// const redwoodProjectRoot =
+//   "/Users/orta/dev/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
 
 // TO:
 
 // vendored
-const to =
-  "/Users/orta/dev/redwood-codegen-api-types/tests/vendor/soccersage-output";
+// const to =
+//   "/Users/orta/dev/redwood-codegen-api-types/tests/vendor/soccersage-output";
 
 // app
-// const to = "/Users/orta/dev/puzmo/api/src/lib/types";
+const to = "/Users/orta/dev/puzmo/api/src/lib/types";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {

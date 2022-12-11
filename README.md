@@ -59,6 +59,7 @@ You can see what it looks like when running on a small, but real, Redwood projec
 
 ## TODO
 
+- Create an internal and external representation of the shared schema, the internal representation would take into account resolvers defined in the file as being optional.
 - Feel good that all [these types](https://github.com/redwoodjs/redwood/pull/6228) are accounted for
 - Types for things like parents need to take into account known resolvers which are declared in a service, and force them to be optional
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )
