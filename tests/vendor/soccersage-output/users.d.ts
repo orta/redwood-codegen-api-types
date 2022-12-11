@@ -1,6 +1,6 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
-import type { CreateUserInput, UpdateUserInput, SuccessInput } from "./shared-schema-types.d.ts";
+import type { CreateUserInput, UpdateUserInput, SuccessInput } from "./shared-schema-types";
 import type { User as PUser, Prediction as PPrediction } from "@prisma/client";
 
 export interface QUsers {
@@ -50,23 +50,23 @@ type UserAsParent = PUser & { id: () => Promise<number>,
 
 export interface UserResolvers {
     /** SDL: id: Int! */
-    id: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number;
+    id: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<number> | number;
     /** SDL: email: String! */
-    email: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
+    email: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
     /** SDL: username: String! */
-    username: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
+    username: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
     /** SDL: hashedPassword: String! */
-    hashedPassword: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
+    hashedPassword: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
     /** SDL: resetToken: String */
-    resetToken: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | undefined;
+    resetToken: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string | undefined> | string | undefined;
     /** SDL: resetTokenExpiresAt: DateTime */
-    resetTokenExpiresAt: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => DateTime | undefined;
+    resetTokenExpiresAt: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<DateTime | undefined> | DateTime | undefined;
     /** SDL: salt: String! */
-    salt: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
+    salt: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
     /** SDL: roles: String! */
-    roles: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
+    roles: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
     /** SDL: predictions: [Prediction]! */
-    predictions: (args: {}, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction | undefined>;
+    predictions: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<Array<PPrediction | undefined>> | Array<PPrediction | undefined>;
 }
 
 type DateTime = any;

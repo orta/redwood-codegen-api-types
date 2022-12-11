@@ -1,6 +1,6 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
-import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types.d.ts";
+import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types";
 import type { Season as PSeason, Prediction as PPrediction } from "@prisma/client";
 
 export interface QSeasons {
@@ -36,15 +36,15 @@ type SeasonAsParent = PSeason & { id: () => Promise<number>,
 
 export interface SeasonResolvers {
     /** SDL: id: Int! */
-    id: (args: {}, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number;
+    id: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<number> | number;
     /** SDL: name: String! */
-    name: (args: {}, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string;
+    name: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
     /** SDL: startDate: DateTime! */
-    startDate: (args: {}, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => DateTime;
+    startDate: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<DateTime> | DateTime;
     /** SDL: endDate: DateTime! */
-    endDate: (args: {}, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => DateTime;
+    endDate: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<DateTime> | DateTime;
     /** SDL: Prediction: [Prediction]! */
-    Prediction: (args: {}, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction | undefined>;
+    Prediction: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<Array<PPrediction | undefined>> | Array<PPrediction | undefined>;
 }
 
 type DateTime = any;

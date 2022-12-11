@@ -25,13 +25,24 @@ const getPrismaSchemaFromFile = async (settings: AppContext["settings"]) => {
   prismaSchema = prismaModeller(prismaSchemaBlocks);
 };
 
+// FROM:
 // Mac
-const redwoodProjectRoot = "/Users/orta/dev/puzmo/";
+// const redwoodProjectRoot = "/Users/orta/dev/puzmo/";
 /// Linux
 // const redwoodProjectRoot = "/home/orta/dev/puzmo/puzmo/";
 
 // Vendored
-// const redwoodProjectRoot = "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
+const redwoodProjectRoot =
+  "/Users/orta/dev/redwood-codegen-api-types/tests/vendor/soccersage.io-main";
+
+// TO:
+
+// vendored
+const to =
+  "/Users/orta/dev/redwood-codegen-api-types/tests/vendor/soccersage-output";
+
+// app
+// const to = "/Users/orta/dev/puzmo/api/src/lib/types";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -51,14 +62,14 @@ if (import.meta.main) {
     sharedFilename: "shared-schema-types.d.ts",
     // typesFolderRoot: "/Users/orta/dev/redwood-codegen-api-types/ignored/puzmo",
     // typesFolderRoot: "/home/orta/dev/puzmo/redwood-codegen-api-types/tests/vendor/soccersage-output",
-    typesFolderRoot: "/Users/orta/dev/puzmo/api/src/lib/types",
+    typesFolderRoot: to,
   };
 
   await getGraphQLSDLFromFile(settings);
   await getPrismaSchemaFromFile(settings);
 
   const appContext: AppContext = {
-    gql: gqlSchema,
+    gql: gqlSchema!,
     prisma: prismaSchema,
     tsProject: project,
     settings,
