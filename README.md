@@ -76,6 +76,5 @@ MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
 ## TODO
 
 - Feel good that all [these types](https://github.com/redwoodjs/redwood/pull/6228) are accounted for
-- Types for things like parents need to take into account known resolvers which are declared in a service, and force them to be optional
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )
 - Create an 'unuused resolvers' interface for auto-complete on the main type resolvers?
