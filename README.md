@@ -8,28 +8,52 @@ So, this project is what I have been referring to as 'relay style' types codegen
 
 I like to think of it as taking all of the work which happens in the type system, from types like:
 
-```graphql
-export type AccountRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = {
-    createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
-    email?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
-    users?: RequiredResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType>;
-}
+```ts
+export type AccountRelationResolvers<
+  ContextType = RedwoodGraphQLContext,
+  ParentType extends ResolversParentTypes["Account"] = ResolversParentTypes["Account"]
+> = {
+  createdAt?: RequiredResolverFn<
+    ResolversTypes["DateTime"],
+    ParentType,
+    ContextType
+  >;
+  email?: RequiredResolverFn<ResolversTypes["String"], ParentType, ContextType>;
+  users?: RequiredResolverFn<
+    Array<ResolversTypes["User"]>,
+    ParentType,
+    ContextType
+  >;
+};
 
 export type ResolversParentTypes = {
-  Account: MergePrismaWithSdlTypes<PrismaAccount, MakeRelationsOptional<Account, AllMappedModels>, AllMappedModels>;
-}
+  Account: MergePrismaWithSdlTypes<
+    PrismaAccount,
+    MakeRelationsOptional<Account, AllMappedModels>,
+    AllMappedModels
+  >;
+};
 
 // ...
 ```
 
-and manually applies them, with an understanding of how redwood works to just be the results:
+and manually applies them, with an understanding of how Redwood works to just be the outcome:
 
-```gql
+```ts
+import type { Account as PAccount, User as PUser } from "@prisma/client";
+
 type AccountAsParent = PAccount & { users: () => Promise<PUser[]> };
 
-export interface AccountResolvers {
-    /** SDL: users: [User!]! */
-    users: (args: {}, obj: { root: AccountAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PUser[] | Promise<PUser[]>;
+export interface AccountTypeResolvers {
+  /** SDL: users: [User!]! */
+  users: (
+    args: undefined,
+    obj: {
+      root: AccountAsParent;
+      context: RedwoodGraphQLContext;
+      info: GraphQLResolveInfo;
+    }
+  ) => PUser[] | Promise<PUser[]> | (() => Promise<PUser[]>);
 }
 ```
 
