@@ -46,13 +46,14 @@ export const createSharedSchemaFiles = (context: AppContext) => {
             docs.push(prismaField.leadingComments.trim());
           }
           // if (obj.description) docs.push(obj.description);
-          const optional = fieldFacts.get(name)?.[fieldName]?.hasResolverImplementation;
+          const hasResolverImplementation = fieldFacts.get(name)?.[fieldName]?.hasResolverImplementation;
+          const isOptionalInSDL = !graphql.isNonNullType(obj.type);
 
           const field: tsMorph.OptionalKind<tsMorph.PropertySignatureStructure> = {
             name: fieldName,
-            type: mapper.map(obj.type),
+            type: mapper.map(obj.type, {}),
             docs,
-            hasQuestionToken: optional,
+            hasQuestionToken: hasResolverImplementation || isOptionalInSDL,
           };
           return field;
         }),

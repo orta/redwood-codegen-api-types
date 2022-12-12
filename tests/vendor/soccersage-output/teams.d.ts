@@ -10,7 +10,7 @@ export interface QTeams {
 
 /** SDL: team(id: Int!): Team */
 export interface QTeam {
-    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam | undefined | Promise<PTeam | undefined> | (() => Promise<PTeam | undefined>);
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam| null | Promise<PTeam| null> | (() => Promise<PTeam| null>);
 }
 
 /** SDL: createTeam(input: CreateTeamInput!): Team! */
@@ -31,21 +31,21 @@ export interface MDeleteTeam {
 type TeamAsParent = PTeam & { id: () => Promise<number>, 
     name: () => Promise<string>, 
     logoUrl: () => Promise<string | undefined>, 
-    Prediction: () => Promise<Array<PPrediction | undefined>>, 
-    homeTeamGames: () => Promise<Array<PGame | undefined>>, 
-    awayTeamGames: () => Promise<Array<PGame | undefined>> };
+    Prediction: () => Promise<Array<PPrediction>>, 
+    homeTeamGames: () => Promise<Array<PGame>>, 
+    awayTeamGames: () => Promise<Array<PGame>> };
 
 export interface TeamResolvers {
     /** SDL: id: Int! */
-    id: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<number> | number;
+    id: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
     /** SDL: name: String! */
-    name: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
+    name: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
     /** SDL: logoUrl: String */
-    logoUrl: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string | undefined> | string | undefined;
+    logoUrl: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string| null | Promise<string| null> | (() => Promise<string| null>);
     /** SDL: Prediction: [Prediction]! */
-    Prediction: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<Array<PPrediction | undefined>> | Array<PPrediction | undefined>;
+    Prediction: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction> | Promise<Array<PPrediction>> | (() => Promise<Array<PPrediction>>);
     /** SDL: homeTeamGames: [Game]! */
-    homeTeamGames: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<Array<PGame | undefined>> | Array<PGame | undefined>;
+    homeTeamGames: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PGame> | Promise<Array<PGame>> | (() => Promise<Array<PGame>>);
     /** SDL: awayTeamGames: [Game]! */
-    awayTeamGames: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<Array<PGame | undefined>> | Array<PGame | undefined>;
+    awayTeamGames: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PGame> | Promise<Array<PGame>> | (() => Promise<Array<PGame>>);
 }

@@ -27,21 +27,24 @@ export const typeMapper = (
 
   const map = (
     type: graphql.GraphQLType,
-    parentWasNotNull?: true,
+    mapConfig: {
+      parentWasNotNull?: true;
+      preferNullOverUndefined?: true;
+    },
   ): string | undefined => {
     // The AST for GQL uses a parent node to indicate the !, we need the opposite
     // for TS which uses '| undefined' after.
     if (graphql.isNonNullType(type)) {
-      return map(type.ofType, true);
+      return map(type.ofType, { parentWasNotNull: true, ...mapConfig });
     }
 
     // So we can add the | undefined
     const getInner = () => {
       if (graphql.isListType(type)) {
         if (graphql.isNonNullType(type.ofType)) {
-          return `${map(type.ofType)}[]`;
+          return `${map(type.ofType, mapConfig)}[]`;
         } else {
-          return `Array<${map(type.ofType)}>`;
+          return `Array<${map(type.ofType, mapConfig)}>`;
         }
       }
       if (graphql.isScalarType(type)) {
@@ -74,7 +77,7 @@ export const typeMapper = (
       }
       if (graphql.isUnionType(type)) {
         const types = type.getTypes();
-        return types.map((t) => map(t)).join(" | ");
+        return types.map((t) => map(t, mapConfig)).join(" | ");
       }
       if (graphql.isEnumType(type)) {
         return type.name;
@@ -90,7 +93,7 @@ export const typeMapper = (
       );
     };
 
-    const suffix = parentWasNotNull ? "" : " | undefined";
+    const suffix = mapConfig.parentWasNotNull ? "" : mapConfig.preferNullOverUndefined ? "| null" : " | undefined";
     return getInner() + suffix;
   };
 

@@ -1,82 +1,50 @@
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
 import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types";
-import type { Prediction as PPrediction, Season as PSeason } from "@prisma/client";
+import type { Season as PSeason, Prediction as PPrediction } from "@prisma/client";
 
 /** SDL: seasons: [Season!]! */
 export interface QSeasons {
-  (
-    args: {},
-    obj: { root: {}; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ): PSeason[] | Promise<PSeason[]> | (() => Promise<PSeason[]>);
+    (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason[] | Promise<PSeason[]> | (() => Promise<PSeason[]>);
 }
 
 /** SDL: season(id: Int!): Season */
 export interface QSeason {
-  (
-    args: { id: number },
-    obj: { root: {}; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ): PSeason | undefined | Promise<PSeason | undefined> | (() => Promise<PSeason | undefined>);
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason| null | Promise<PSeason| null> | (() => Promise<PSeason| null>);
 }
 
 /** SDL: createSeason(input: CreateSeasonInput!): Season! */
 export interface MCreateSeason {
-  (
-    args: { input: CreateSeasonInput },
-    obj: { root: {}; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
+    (args: {input: CreateSeasonInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }
 
 /** SDL: updateSeason(id: Int!, input: UpdateSeasonInput!): Season! */
 export interface MUpdateSeason {
-  (
-    args: { id: number; input: UpdateSeasonInput },
-    obj: { root: {}; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
+    (args: {id: number, input: UpdateSeasonInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }
 
 /** SDL: deleteSeason(id: Int!): Season! */
 export interface MDeleteSeason {
-  (
-    args: { id: number },
-    obj: { root: {}; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }
 
-type SeasonAsParent = PSeason & {
-  id: () => Promise<number>;
-  name: () => Promise<string>;
-  startDate: () => Promise<DateTime>;
-  endDate: () => Promise<DateTime>;
-  Prediction: () => Promise<Array<PPrediction | undefined>>;
-};
+type SeasonAsParent = PSeason & { id: () => Promise<number>, 
+    name: () => Promise<string>, 
+    startDate: () => Promise<DateTime>, 
+    endDate: () => Promise<DateTime>, 
+    Prediction: () => Promise<Array<PPrediction>> };
 
 export interface SeasonResolvers {
-  /** SDL: id: Int! */
-  id: (
-    args: undefined,
-    obj: { root: SeasonAsParent; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ) => Promise<number> | number;
-  /** SDL: name: String! */
-  name: (
-    args: undefined,
-    obj: { root: SeasonAsParent; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ) => Promise<string> | string;
-  /** SDL: startDate: DateTime! */
-  startDate: (
-    args: undefined,
-    obj: { root: SeasonAsParent; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ) => Promise<DateTime> | DateTime;
-  /** SDL: endDate: DateTime! */
-  endDate: (
-    args: undefined,
-    obj: { root: SeasonAsParent; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ) => Promise<DateTime> | DateTime;
-  /** SDL: Prediction: [Prediction]! */
-  Prediction: (
-    args: undefined,
-    obj: { root: SeasonAsParent; context: RedwoodGraphQLContext; info: GraphQLResolveInfo },
-  ) => Promise<Array<PPrediction | undefined>> | Array<PPrediction | undefined>;
+    /** SDL: id: Int! */
+    id: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
+    /** SDL: name: String! */
+    name: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
+    /** SDL: startDate: DateTime! */
+    startDate: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => DateTime | Promise<DateTime> | (() => Promise<DateTime>);
+    /** SDL: endDate: DateTime! */
+    endDate: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => DateTime | Promise<DateTime> | (() => Promise<DateTime>);
+    /** SDL: Prediction: [Prediction]! */
+    Prediction: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction> | Promise<Array<PPrediction>> | (() => Promise<Array<PPrediction>>);
 }
 
 type DateTime = any;

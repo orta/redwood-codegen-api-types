@@ -138,7 +138,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
     const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "{}" : config.parentName;
 
-    const tType = map(field.type);
+    const tType = map(field.type, { preferNullOverUndefined: true });
     const returnType = `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
 
     interfaceDeclaration.addCallSignature({
@@ -212,7 +212,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       const parentType = fileDTS.addTypeAlias({
         name: `${name}AsParent`,
         type: `P${name} & { ${
-          keys.map((k) => `${k}: () => Promise<${map(fields[k].type)}>`).join(
+          keys.map((k) => `${k}: () => Promise<${map(fields[k].type, {})}>`).join(
             ", \n",
           )
         } }`,
@@ -231,12 +231,14 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
           const argsType = field.args?.length
             // Always use an args obj
-            ? `{${field.args.map((f) => `${f.name}: ${map(f.type)}`).join(", ")}}`
+            ? `{${field.args.map((f) => `${f.name}: ${map(f.type, {})}`).join(", ")}}`
             : undefined;
 
           const innerArgs = `args: ${argsType}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
 
-          const returnType = `Promise<${map(field.type)}> | ${map(field.type)}`;
+          const returnObj = map(field.type, { preferNullOverUndefined: true });
+          const returnType = `${returnObj} | Promise<${returnObj}> | (() => Promise<${returnObj}>)`;
+
           resolverInterface.addProperty({
             name: k,
             docs: ["SDL: " + graphql.print(field.astNode!)],

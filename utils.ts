@@ -19,7 +19,7 @@ export const createAndReferOrInlineArgsForField = (
 
   // inline the type if it's small
   const inlineArgs = "{" +
-    field.args.map((f) => `${f.name}: ${config.mapper(f.type)}`).join(", ") +
+    field.args.map((f) => `${f.name}: ${config.mapper(f.type, {})}`).join(", ") +
     "}";
 
   if (inlineArgs.length < 120) return inlineArgs;
@@ -32,7 +32,7 @@ export const createAndReferOrInlineArgsForField = (
   field.args.forEach((a) => {
     argsInterface.addProperty({
       name: a.name,
-      type: config.mapper(a.type),
+      type: config.mapper(a.type, {}),
     });
   });
 

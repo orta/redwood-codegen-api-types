@@ -10,7 +10,7 @@ export interface QUsers {
 
 /** SDL: user(id: Int!): User */
 export interface QUser {
-    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser | undefined | Promise<PUser | undefined> | (() => Promise<PUser | undefined>);
+    (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser| null | Promise<PUser| null> | (() => Promise<PUser| null>);
 }
 
 /** SDL: createUser(input: CreateUserInput!): User! */
@@ -30,7 +30,7 @@ export interface MDeleteUser {
 
 /** SDL: sendResetPasswordEmail(email: String!): SuccessInput */
 export interface MSendResetPasswordEmail {
-    (args: {email: string}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): SuccessInput | undefined | Promise<SuccessInput | undefined> | (() => Promise<SuccessInput | undefined>);
+    (args: {email: string}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): SuccessInput| null | Promise<SuccessInput| null> | (() => Promise<SuccessInput| null>);
 }
 
 /** SDL: resetPassword(password: String!, resetToken: String!): User! */
@@ -46,27 +46,27 @@ type UserAsParent = PUser & { id: () => Promise<number>,
     resetTokenExpiresAt: () => Promise<DateTime | undefined>, 
     salt: () => Promise<string>, 
     roles: () => Promise<string>, 
-    predictions: () => Promise<Array<PPrediction | undefined>> };
+    predictions: () => Promise<Array<PPrediction>> };
 
 export interface UserResolvers {
     /** SDL: id: Int! */
-    id: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<number> | number;
+    id: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
     /** SDL: email: String! */
-    email: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
+    email: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
     /** SDL: username: String! */
-    username: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
+    username: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
     /** SDL: hashedPassword: String! */
-    hashedPassword: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
+    hashedPassword: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
     /** SDL: resetToken: String */
-    resetToken: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string | undefined> | string | undefined;
+    resetToken: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string| null | Promise<string| null> | (() => Promise<string| null>);
     /** SDL: resetTokenExpiresAt: DateTime */
-    resetTokenExpiresAt: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<DateTime | undefined> | DateTime | undefined;
+    resetTokenExpiresAt: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => DateTime| null | Promise<DateTime| null> | (() => Promise<DateTime| null>);
     /** SDL: salt: String! */
-    salt: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
+    salt: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
     /** SDL: roles: String! */
-    roles: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string> | string;
+    roles: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
     /** SDL: predictions: [Prediction]! */
-    predictions: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<Array<PPrediction | undefined>> | Array<PPrediction | undefined>;
+    predictions: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction> | Promise<Array<PPrediction>> | (() => Promise<Array<PPrediction>>);
 }
 
 type DateTime = any;
