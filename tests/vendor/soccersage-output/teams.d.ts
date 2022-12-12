@@ -4,27 +4,27 @@ import type { CreateTeamInput, UpdateTeamInput } from "./shared-schema-types";
 import type { Team as PTeam, Prediction as PPrediction, Game as PGame } from "@prisma/client";
 
 /** SDL: teams: [Team!]! */
-export interface QTeams {
+export interface TeamsResolver {
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam[] | Promise<PTeam[]> | (() => Promise<PTeam[]>);
 }
 
 /** SDL: team(id: Int!): Team */
-export interface QTeam {
+export interface TeamResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam| null | Promise<PTeam| null> | (() => Promise<PTeam| null>);
 }
 
 /** SDL: createTeam(input: CreateTeamInput!): Team! */
-export interface MCreateTeam {
+export interface CreateTeamResolver {
     (args: {input: CreateTeamInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam | Promise<PTeam> | (() => Promise<PTeam>);
 }
 
 /** SDL: updateTeam(id: Int!, input: UpdateTeamInput!): Team! */
-export interface MUpdateTeam {
+export interface UpdateTeamResolver {
     (args: {id: number, input: UpdateTeamInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam | Promise<PTeam> | (() => Promise<PTeam>);
 }
 
 /** SDL: deleteTeam(id: Int!): Team! */
-export interface MDeleteTeam {
+export interface DeleteTeamResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PTeam | Promise<PTeam> | (() => Promise<PTeam>);
 }
 
@@ -35,7 +35,7 @@ type TeamAsParent = PTeam & { id: () => Promise<number>,
     homeTeamGames: () => Promise<Array<PGame>>, 
     awayTeamGames: () => Promise<Array<PGame>> };
 
-export interface TeamResolvers {
+export interface TeamTypeResolvers {
     /** SDL: id: Int! */
     id: (args: undefined, obj: { root: TeamAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
     /** SDL: name: String! */

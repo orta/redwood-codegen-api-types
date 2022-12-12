@@ -4,27 +4,27 @@ import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types
 import type { Season as PSeason, Prediction as PPrediction } from "@prisma/client";
 
 /** SDL: seasons: [Season!]! */
-export interface QSeasons {
+export interface SeasonsResolver {
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason[] | Promise<PSeason[]> | (() => Promise<PSeason[]>);
 }
 
 /** SDL: season(id: Int!): Season */
-export interface QSeason {
+export interface SeasonResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason| null | Promise<PSeason| null> | (() => Promise<PSeason| null>);
 }
 
 /** SDL: createSeason(input: CreateSeasonInput!): Season! */
-export interface MCreateSeason {
+export interface CreateSeasonResolver {
     (args: {input: CreateSeasonInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }
 
 /** SDL: updateSeason(id: Int!, input: UpdateSeasonInput!): Season! */
-export interface MUpdateSeason {
+export interface UpdateSeasonResolver {
     (args: {id: number, input: UpdateSeasonInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }
 
 /** SDL: deleteSeason(id: Int!): Season! */
-export interface MDeleteSeason {
+export interface DeleteSeasonResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }
 
@@ -34,7 +34,7 @@ type SeasonAsParent = PSeason & { id: () => Promise<number>,
     endDate: () => Promise<DateTime>, 
     Prediction: () => Promise<Array<PPrediction>> };
 
-export interface SeasonResolvers {
+export interface SeasonTypeResolvers {
     /** SDL: id: Int! */
     id: (args: undefined, obj: { root: SeasonAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
     /** SDL: name: String! */

@@ -2,7 +2,7 @@ import { capitalizeFirstLetter, createAndReferOrInlineArgsForField, variableDecl
 import { typeMapper } from "./typeMap.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { AppContext } from "./context.ts";
-import { FieldFact, FieldFacts } from "./typeFacts.ts";
+import { FieldFacts } from "./typeFacts.ts";
 
 export const lookAtServiceFile = async (file: string, context: AppContext) => {
   const { gql, prisma, tsProject, settings } = context;
@@ -119,11 +119,10 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       return;
     }
 
-    const prefix = isQuery ? "Q" : "M";
     // if (!field) throw new Error(`No field named ${name} on Query`)
 
     const interfaceDeclaration = fileDTS.addInterface({
-      name: `${prefix}${capitalizeFirstLetter(name)}`,
+      name: `${capitalizeFirstLetter(name)}Resolver`,
       isExported: true,
       docs: ["SDL: " + graphql.print(field.astNode!)],
     });
@@ -219,7 +218,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       });
 
       const resolverInterface = fileDTS.addInterface({
-        name: `${name}Resolvers`,
+        name: `${name}TypeResolvers`,
         isExported: true,
       });
 

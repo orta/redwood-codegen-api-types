@@ -4,37 +4,37 @@ import type { CreateUserInput, UpdateUserInput, SuccessInput } from "./shared-sc
 import type { User as PUser, Prediction as PPrediction } from "@prisma/client";
 
 /** SDL: users: [User!]! */
-export interface QUsers {
+export interface UsersResolver {
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser[] | Promise<PUser[]> | (() => Promise<PUser[]>);
 }
 
 /** SDL: user(id: Int!): User */
-export interface QUser {
+export interface UserResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser| null | Promise<PUser| null> | (() => Promise<PUser| null>);
 }
 
 /** SDL: createUser(input: CreateUserInput!): User! */
-export interface MCreateUser {
+export interface CreateUserResolver {
     (args: {input: CreateUserInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser | Promise<PUser> | (() => Promise<PUser>);
 }
 
 /** SDL: updateUser(id: Int!, input: UpdateUserInput!): User! */
-export interface MUpdateUser {
+export interface UpdateUserResolver {
     (args: {id: number, input: UpdateUserInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser | Promise<PUser> | (() => Promise<PUser>);
 }
 
 /** SDL: deleteUser(id: Int!): User! */
-export interface MDeleteUser {
+export interface DeleteUserResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser | Promise<PUser> | (() => Promise<PUser>);
 }
 
 /** SDL: sendResetPasswordEmail(email: String!): SuccessInput */
-export interface MSendResetPasswordEmail {
+export interface SendResetPasswordEmailResolver {
     (args: {email: string}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): SuccessInput| null | Promise<SuccessInput| null> | (() => Promise<SuccessInput| null>);
 }
 
 /** SDL: resetPassword(password: String!, resetToken: String!): User! */
-export interface MResetPassword {
+export interface ResetPasswordResolver {
     (args: {password: string, resetToken: string}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PUser | Promise<PUser> | (() => Promise<PUser>);
 }
 
@@ -48,7 +48,7 @@ type UserAsParent = PUser & { id: () => Promise<number>,
     roles: () => Promise<string>, 
     predictions: () => Promise<Array<PPrediction>> };
 
-export interface UserResolvers {
+export interface UserTypeResolvers {
     /** SDL: id: Int! */
     id: (args: undefined, obj: { root: UserAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
     /** SDL: email: String! */

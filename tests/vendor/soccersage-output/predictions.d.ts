@@ -4,37 +4,37 @@ import type { StandingsResult, CreatePredictionInput, UpdatePredictionInput } fr
 import type { Prediction as PPrediction, User as PUser, Team as PTeam, Game as PGame } from "@prisma/client";
 
 /** SDL: standings(seasonId: Int!): StandingsResult */
-export interface QStandings {
+export interface StandingsResolver {
     (args: {seasonId: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): StandingsResult| null | Promise<StandingsResult| null> | (() => Promise<StandingsResult| null>);
 }
 
 /** SDL: predictions: [Prediction!]! */
-export interface QPredictions {
+export interface PredictionsResolver {
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | (() => Promise<PPrediction[]>);
 }
 
 /** SDL: myPredictions: [Prediction!]! */
-export interface QMyPredictions {
+export interface MyPredictionsResolver {
     (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction[] | Promise<PPrediction[]> | (() => Promise<PPrediction[]>);
 }
 
 /** SDL: prediction(id: Int!): Prediction */
-export interface QPrediction {
+export interface PredictionResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction| null | Promise<PPrediction| null> | (() => Promise<PPrediction| null>);
 }
 
 /** SDL: createPrediction(input: CreatePredictionInput!): Prediction! */
-export interface MCreatePrediction {
+export interface CreatePredictionResolver {
     (args: {input: CreatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | (() => Promise<PPrediction>);
 }
 
 /** SDL: updatePrediction(id: Int!, input: UpdatePredictionInput!): Prediction! */
-export interface MUpdatePrediction {
+export interface UpdatePredictionResolver {
     (args: {id: number, input: UpdatePredictionInput}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | (() => Promise<PPrediction>);
 }
 
 /** SDL: deletePrediction(id: Int!): Prediction! */
-export interface MDeletePrediction {
+export interface DeletePredictionResolver {
     (args: {id: number}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PPrediction | Promise<PPrediction> | (() => Promise<PPrediction>);
 }
 
@@ -47,7 +47,7 @@ type PredictionAsParent = PPrediction & { id: () => Promise<number>,
     team: () => Promise<PTeam | undefined>, 
     game: () => Promise<PGame> };
 
-export interface PredictionResolvers {
+export interface PredictionTypeResolvers {
     /** SDL: id: Int! */
     id: (args: undefined, obj: { root: PredictionAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => number | Promise<number> | (() => Promise<number>);
     /** SDL: teamId: Int */
