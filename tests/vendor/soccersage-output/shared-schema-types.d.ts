@@ -1,192 +1,213 @@
 export interface CreateGameInput {
-    awayTeamId: number;
-    awayTeamScore?: number | undefined;
-    homeTeamId: number;
-    homeTeamScore?: number | undefined;
-    isCompleted?: boolean | undefined;
-    seasonId: number;
-    startDateTime: DateTime;
+  __typename?: "CreateGameInput";
+  awayTeamId: number;
+  awayTeamScore?: number | null;
+  homeTeamId: number;
+  homeTeamScore?: number | null;
+  isCompleted?: boolean | null;
+  seasonId: number;
+  startDateTime: DateTime;
 }
 
 export interface CreatePredictionInput {
-    gameId: number;
-    prediction: string;
-    seasonId: number;
-    teamId?: number | undefined;
-    userId: number;
+  __typename?: "CreatePredictionInput";
+  gameId: number;
+  prediction: string;
+  seasonId: number;
+  teamId?: number | null;
+  userId: number;
 }
 
 export interface CreateSeasonInput {
-    endDate: DateTime;
-    name: string;
-    startDate: DateTime;
+  __typename?: "CreateSeasonInput";
+  endDate: DateTime;
+  name: string;
+  startDate: DateTime;
 }
 
 export interface CreateTeamInput {
-    logoUrl?: string | undefined;
-    name: string;
+  __typename?: "CreateTeamInput";
+  logoUrl?: string | null;
+  name: string;
 }
 
 export interface CreateUserInput {
-    email: string;
-    hashedPassword: string;
-    resetToken?: string | undefined;
-    resetTokenExpiresAt?: DateTime | undefined;
-    roles: string;
-    salt: string;
-    username: string;
+  __typename?: "CreateUserInput";
+  email: string;
+  hashedPassword: string;
+  resetToken?: string | null;
+  resetTokenExpiresAt?: DateTime | null;
+  roles: string;
+  salt: string;
+  username: string;
 }
 
 export interface Game {
-    awayTeam?: Team;
-    awayTeamId: number;
-    awayTeamScore?: number | undefined;
-    homeTeam?: Team;
-    homeTeamId: number;
-    homeTeamScore?: number | undefined;
-    id: number;
-    isCompleted: boolean;
-    predictions?: Array<Prediction>;
-    season?: Season;
-    seasonId: number;
-    startDateTime: DateTime;
+  __typename?: "Game";
+  awayTeam?: Team;
+  awayTeamId: number;
+  awayTeamScore?: number | null;
+  homeTeam?: Team;
+  homeTeamId: number;
+  homeTeamScore?: number | null;
+  id: number;
+  isCompleted: boolean;
+  predictions?: Array<Prediction>;
+  season?: Season;
+  seasonId: number;
+  startDateTime: DateTime;
 }
 
 export interface Mutation {
-    createGame: Game;
-    createPrediction: Prediction;
-    createSeason: Season;
-    createTeam: Team;
-    createUser: User;
-    deleteGame: Game;
-    deletePrediction: Prediction;
-    deleteSeason: Season;
-    deleteTeam: Team;
-    deleteUser: User;
-    resetPassword: User;
-    sendResetPasswordEmail?: SuccessInput | undefined;
-    updateGame: Game;
-    updatePrediction: Prediction;
-    updateSeason: Season;
-    updateTeam: Team;
-    updateUser: User;
+  __typename?: "Mutation";
+  createGame: Game;
+  createPrediction: Prediction;
+  createSeason: Season;
+  createTeam: Team;
+  createUser: User;
+  deleteGame: Game;
+  deletePrediction: Prediction;
+  deleteSeason: Season;
+  deleteTeam: Team;
+  deleteUser: User;
+  resetPassword: User;
+  sendResetPasswordEmail?: SuccessInput | null;
+  updateGame: Game;
+  updatePrediction: Prediction;
+  updateSeason: Season;
+  updateTeam: Team;
+  updateUser: User;
 }
 
 export interface Prediction {
-    game?: Game;
-    gameId?: number;
-    id?: number;
-    prediction?: string;
-    team?: Team | undefined;
-    teamId?: number | undefined;
-    user?: User | undefined;
-    userId?: number;
+  __typename?: "Prediction";
+  game?: Game;
+  gameId?: number;
+  id?: number;
+  prediction?: string;
+  team?: Team | null;
+  teamId?: number | null;
+  user?: User | null;
+  userId?: number;
 }
 
 export interface Query {
-    game?: Game | undefined;
-    games: Game[];
-    myPredictions: Prediction[];
-    prediction?: Prediction | undefined;
-    predictions: Prediction[];
-    redwood?: Redwood | undefined;
-    season?: Season | undefined;
-    seasons: Season[];
-    standings?: StandingsResult | undefined;
-    team?: Team | undefined;
-    teams: Team[];
-    upcomingGames: Game[];
-    user?: User | undefined;
-    users: User[];
+  __typename?: "Query";
+  game?: Game | null;
+  games: Game[];
+  myPredictions: Prediction[];
+  prediction?: Prediction | null;
+  predictions: Prediction[];
+  redwood?: Redwood | null;
+  season?: Season | null;
+  seasons: Season[];
+  standings?: StandingsResult | null;
+  team?: Team | null;
+  teams: Team[];
+  upcomingGames: Game[];
+  user?: User | null;
+  users: User[];
 }
 
 export interface Redwood {
-    currentUser?: JSON | undefined;
-    prismaVersion?: string | undefined;
-    version?: string | undefined;
+  __typename?: "Redwood";
+  currentUser?: JSON | null;
+  prismaVersion?: string | null;
+  version?: string | null;
 }
 
 export interface Season {
-    Prediction?: Array<Prediction>;
-    endDate?: DateTime;
-    id?: number;
-    name?: string;
-    startDate?: DateTime;
+  __typename?: "Season";
+  Prediction?: Array<Prediction>;
+  endDate?: DateTime;
+  id?: number;
+  name?: string;
+  startDate?: DateTime;
 }
 
 export interface StandingsData {
-    email: string;
-    score: number;
-    userId: string;
-    username: string;
+  __typename?: "StandingsData";
+  email: string;
+  score: number;
+  userId: string;
+  username: string;
 }
 
 export interface StandingsResult {
-    userIdRankings: StandingsData[];
+  __typename?: "StandingsResult";
+  userIdRankings: StandingsData[];
 }
 
 export interface SuccessInput {
-    message?: string | undefined;
-    success?: boolean | undefined;
+  __typename?: "SuccessInput";
+  message?: string | null;
+  success?: boolean | null;
 }
 
 export interface Team {
-    Prediction?: Array<Prediction>;
-    awayTeamGames?: Array<Game>;
-    homeTeamGames?: Array<Game>;
-    id?: number;
-    logoUrl?: string | undefined;
-    name?: string;
+  __typename?: "Team";
+  Prediction?: Array<Prediction>;
+  awayTeamGames?: Array<Game>;
+  homeTeamGames?: Array<Game>;
+  id?: number;
+  logoUrl?: string | null;
+  name?: string;
 }
 
 export interface UpdateGameInput {
-    awayTeamId?: number | undefined;
-    awayTeamScore?: number | undefined;
-    homeTeamId?: number | undefined;
-    homeTeamScore?: number | undefined;
-    isCompleted?: boolean | undefined;
-    seasonId?: number | undefined;
-    startDateTime?: DateTime | undefined;
+  __typename?: "UpdateGameInput";
+  awayTeamId?: number | null;
+  awayTeamScore?: number | null;
+  homeTeamId?: number | null;
+  homeTeamScore?: number | null;
+  isCompleted?: boolean | null;
+  seasonId?: number | null;
+  startDateTime?: DateTime | null;
 }
 
 export interface UpdatePredictionInput {
-    gameId?: number | undefined;
-    prediction?: string | undefined;
-    teamId?: number | undefined;
-    userId?: number | undefined;
+  __typename?: "UpdatePredictionInput";
+  gameId?: number | null;
+  prediction?: string | null;
+  teamId?: number | null;
+  userId?: number | null;
 }
 
 export interface UpdateSeasonInput {
-    endDate?: DateTime | undefined;
-    name?: string | undefined;
-    startDate?: DateTime | undefined;
+  __typename?: "UpdateSeasonInput";
+  endDate?: DateTime | null;
+  name?: string | null;
+  startDate?: DateTime | null;
 }
 
 export interface UpdateTeamInput {
-    logoUrl?: string | undefined;
-    name?: string | undefined;
+  __typename?: "UpdateTeamInput";
+  logoUrl?: string | null;
+  name?: string | null;
 }
 
 export interface UpdateUserInput {
-    email?: string | undefined;
-    hashedPassword?: string | undefined;
-    resetToken?: string | undefined;
-    resetTokenExpiresAt?: DateTime | undefined;
-    roles?: string | undefined;
-    salt?: string | undefined;
-    username?: string | undefined;
+  __typename?: "UpdateUserInput";
+  email?: string | null;
+  hashedPassword?: string | null;
+  resetToken?: string | null;
+  resetTokenExpiresAt?: DateTime | null;
+  roles?: string | null;
+  salt?: string | null;
+  username?: string | null;
 }
 
 export interface User {
-    email?: string;
-    hashedPassword?: string;
-    id?: number;
-    predictions?: Array<Prediction>;
-    resetToken?: string | undefined;
-    resetTokenExpiresAt?: DateTime | undefined;
-    roles?: string;
-    salt?: string;
-    username?: string;
+  __typename?: "User";
+  email?: string;
+  hashedPassword?: string;
+  id?: number;
+  predictions?: Array<Prediction>;
+  resetToken?: string | null;
+  resetTokenExpiresAt?: DateTime | null;
+  roles?: string;
+  salt?: string;
+  username?: string;
 }
 
 type DateTime = any;

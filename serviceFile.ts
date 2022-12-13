@@ -92,6 +92,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     });
   }
 
+  fileDTS.formatText({ indentSize: 2 });
+
   Deno.writeTextFileSync(
     path.join(
       context.settings.typesFolderRoot,

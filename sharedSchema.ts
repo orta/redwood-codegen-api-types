@@ -38,25 +38,33 @@ export const createSharedSchemaFiles = (context: AppContext) => {
         name: type.name,
         isExported: true,
         docs: [],
-        properties: Object.entries(type.getFields()).map(([fieldName, obj]) => {
-          const docs = [];
-          const prismaField = pType?.properties.get(fieldName);
+        properties: [
+          {
+            name: "__typename",
+            type: `"${type.name}"`,
+            hasQuestionToken: true,
+          },
+          ...Object.entries(type.getFields()).map(([fieldName, obj]) => {
+            const docs = [];
+            const prismaField = pType?.properties.get(fieldName);
 
-          if (prismaField && prismaField.leadingComments.length) {
-            docs.push(prismaField.leadingComments.trim());
-          }
-          // if (obj.description) docs.push(obj.description);
-          const hasResolverImplementation = fieldFacts.get(name)?.[fieldName]?.hasResolverImplementation;
-          const isOptionalInSDL = !graphql.isNonNullType(obj.type);
+            if (prismaField && prismaField.leadingComments.length) {
+              docs.push(prismaField.leadingComments.trim());
+            }
+            // if (obj.description) docs.push(obj.description);
+            const hasResolverImplementation = fieldFacts.get(name)?.[fieldName]?.hasResolverImplementation;
+            const isOptionalInSDL = !graphql.isNonNullType(obj.type);
+            const doesNotExistInPrisma = false; // !prismaField;
 
-          const field: tsMorph.OptionalKind<tsMorph.PropertySignatureStructure> = {
-            name: fieldName,
-            type: mapper.map(obj.type, {}),
-            docs,
-            hasQuestionToken: hasResolverImplementation || isOptionalInSDL,
-          };
-          return field;
-        }),
+            const field: tsMorph.OptionalKind<tsMorph.PropertySignatureStructure> = {
+              name: fieldName,
+              type: mapper.map(obj.type, { preferNullOverUndefined: true }),
+              docs,
+              hasQuestionToken: hasResolverImplementation || isOptionalInSDL || doesNotExistInPrisma,
+            };
+            return field;
+          }),
+        ],
       });
     }
 
@@ -77,6 +85,8 @@ export const createSharedSchemaFiles = (context: AppContext) => {
       })),
     );
   }
+
+  tsFile.formatText({ indentSize: 2 });
 
   Deno.writeTextFileSync(
     path.join(
