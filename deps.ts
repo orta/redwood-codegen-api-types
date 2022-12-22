@@ -1,6 +1,7 @@
 export * as Watchmano from "https://deno.land/x/watchman/mod.ts";
 export { Project } from "https://deno.land/x/ts_morph/mod.ts";
 export * as tsMorph from "https://deno.land/x/ts_morph/mod.ts";
+export { parse } from "https://deno.land/std/flags/mod.ts";
 
 export * as graphql from "npm:graphql@^16";
 export * as watchman from "npm:fb-watchman@2.0.2";

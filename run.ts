@@ -1,33 +1,11 @@
-// deno run --allow-all --unstable main.ts
-// or watch mode:
-// deno run --allow-all --unstable --watch main.ts
-
-import { dotenv, getPrismaSchema, graphql, path, Project } from "./deps.ts";
+import { getPrismaSchema, graphql, path, Project } from "./deps.ts";
 import { PrismaMap, prismaModeller } from "./prismaModeller.ts";
 import { createSharedSchemaFiles } from "./sharedSchema.ts";
 import { AppContext } from "./context.ts";
 import { lookAtServiceFile } from "./serviceFile.ts";
 import { FieldFacts } from "./typeFacts.ts";
 
-// Learn more at https://deno.land/manual/examples/module_metadata#concepts
-if ((import.meta as any).main) {
-  Deno.stdout.write(new TextEncoder().encode("\x1b[2J"));
-  console.log("-----------------------\n");
-
-  const appRoot = Deno.cwd();
-  const vendorSrcRoot = path.join(appRoot, "tests", "vendor", "soccersage.io-main");
-  const vendorTypesRoot = path.join(appRoot, "tests", "vendor", "soccersage-output");
-  await run(vendorSrcRoot, vendorTypesRoot);
-
-  const cfg = await dotenv.config({});
-  if (cfg["MAIN_APP_PATH"]) {
-    const appRoot = cfg["MAIN_APP_PATH"];
-    const typesRoot = cfg["MAIN_TYPES_DEPLOY"];
-    await run(appRoot, typesRoot);
-  }
-}
-
-async function run(appRoot: string, typesRoot: string) {
+export async function run(appRoot: string, typesRoot: string) {
   const project = new Project({ useInMemoryFileSystem: true });
 
   let gqlSchema: graphql.GraphQLSchema | undefined;

@@ -1,4 +1,5 @@
-// ex. scripts/build_npm.ts
+// deno run -A scripts/buildNPM.ts 0.1.0
+
 import { build, emptyDir } from "https://deno.land/x/dnt/mod.ts";
 
 await emptyDir("./npm");
@@ -6,12 +7,11 @@ await emptyDir("./npm");
 await build({
   entryPoints: [{
     kind: "bin",
-    name: "redwood-api-codegen", // command name
-    path: "./main.ts",
+    name: "redwood-api-codegen",
+    path: "./cli.ts",
   }],
   outDir: "./npm",
   shims: {
-    // see JS docs for overview and more options
     deno: true,
     crypto: true,
   },
