@@ -10,7 +10,7 @@ import { lookAtServiceFile } from "./serviceFile.ts";
 import { FieldFacts } from "./typeFacts.ts";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
-if (import.meta.main) {
+if ((import.meta as any).main) {
   Deno.stdout.write(new TextEncoder().encode("\x1b[2J"));
   console.log("-----------------------\n");
 
