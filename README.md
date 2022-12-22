@@ -1,3 +1,22 @@
+## How to use this in a Redwood project
+
+In your root, add the dependency:
+
+```sh
+yarn -W add -D @orta/redwood-codegen-api-types
+```
+
+Then to run the codegen locally:
+
+```sh
+yarn redwood-alt-api-codegen
+```
+
+There are two params you can optionally pass:
+
+- [1] The cwd of your Redwood project: (`.` default)
+- [2] The folder you want the types to get added to: (`./api/src/lib/types` default)
+
 ## Alternative Types Generator for Redwood Projects
 
 Redwood's type generation is pretty reasonable for most projects, but I've found after ~15 months of using Redwood when I turned on TypeScript's strict mode, I've never once got to 0 compiler warnings and performance for auto-complete/errors is not great.
@@ -101,4 +120,4 @@ MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
 
 - Feel good that all [these types](https://github.com/redwoodjs/redwood/pull/6228) are accounted for
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )
-- Create an 'unuused resolvers' interface for auto-complete on the main type resolvers?
+- Create an 'unused resolvers' interface for auto-complete on the main type resolvers?
