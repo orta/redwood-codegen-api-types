@@ -82,11 +82,23 @@ I'm not really sure it makes sense for the Redwood team to think about upstreami
 
 ---
 
-ATM it is a deno script, which generates a suite of .d.ts files. With time, I'd expect it to trigger a runtime server which uses watchman to incrementally update your types as your app changes.
+### Clever features
+
+- Merges comments from Prisma file + GQL into .d.ts files
+- You can set a generic param on a type resolver which can extend the parent's type:
+
+```ts
+export const User: UserTypeResolvers<{ cachedAccount?: Account }> = {
+  account: (args, { root }) => {
+    if (root.cachedAccount) return root.cachedAccount;
+    return db.account.findUnique({ where: { id: root.accountID } });
+  },
+};
+```
+
+- In dev mode it can run eslint fixes over the files it generates, so it is formatted correctly
 
 ---
-
-This is a work in progress, which isn't seeing active use in my main redwood app yet - but it's getting close.
 
 You can see what it looks like when running on a small, but real, Redwood project here:
 
@@ -104,8 +116,10 @@ The dev server will re-run against the fixtures in `tests/vendor`, you can use g
 You can make a `.env` in the root, and the dev server will _also_ run against these paths:
 
 ```
+
 MAIN_APP_PATH="/home/orta/dev/app/"
 MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
+
 ```
 
 ## Done
@@ -119,5 +133,7 @@ MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
 ## TODO
 
 - Feel good that all [these types](https://github.com/redwoodjs/redwood/pull/6228) are accounted for
+- Figure out how to make a 'return position' version of a GQL type, and understand how to determine which is the one we want to use
+
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )
 - Create an 'unused resolvers' interface for auto-complete on the main type resolvers?

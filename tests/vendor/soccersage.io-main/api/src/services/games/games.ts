@@ -51,7 +51,7 @@ export const deleteGame: MDeleteGame = async ({ id }) => {
   });
 };
 
-export const Game: GameResolvers = {
+export const Game: GameResolvers<{ predictions?: any[] }> = {
   predictions: (_obj, { root }) => db.game.findUnique({ where: { id: root.id } }).predictions(),
   homeTeam: (_obj, { root }) => db.game.findUnique({ where: { id: root.id } }).homeTeam(),
   awayTeam: (_obj, { root }) => db.game.findUnique({ where: { id: root.id } }).awayTeam(),

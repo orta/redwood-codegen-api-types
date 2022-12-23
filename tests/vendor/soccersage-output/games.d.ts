@@ -33,20 +33,20 @@ export interface DeleteGameResolver {
   (args: { id: number }, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): PGame | Promise<PGame> | (() => Promise<PGame>);
 }
 
-type GameAsParent = PGame & {
+type GameAsParent<Extended> = PGame & {
   predictions: () => Promise<Array<PPrediction>>,
   homeTeam: () => Promise<PTeam>,
   awayTeam: () => Promise<PTeam>,
   season: () => Promise<PSeason>
-};
+} & Extended;
 
-export interface GameTypeResolvers {
+export interface GameTypeResolvers<Extended> {
   /** SDL: predictions: [Prediction]! */
-  predictions: (args: undefined, obj: { root: GameAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction> | Promise<Array<PPrediction>> | (() => Promise<Array<PPrediction>>);
+  predictions: (args: undefined, obj: { root: GameAsParent<Extended>, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Array<PPrediction> | Promise<Array<PPrediction>> | (() => Promise<Array<PPrediction>>);
   /** SDL: homeTeam: Team! */
-  homeTeam: (args: undefined, obj: { root: GameAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PTeam | Promise<PTeam> | (() => Promise<PTeam>);
+  homeTeam: (args: undefined, obj: { root: GameAsParent<Extended>, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PTeam | Promise<PTeam> | (() => Promise<PTeam>);
   /** SDL: awayTeam: Team! */
-  awayTeam: (args: undefined, obj: { root: GameAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PTeam | Promise<PTeam> | (() => Promise<PTeam>);
+  awayTeam: (args: undefined, obj: { root: GameAsParent<Extended>, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PTeam | Promise<PTeam> | (() => Promise<PTeam>);
   /** SDL: season: Season! */
-  season: (args: undefined, obj: { root: GameAsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PSeason | Promise<PSeason> | (() => Promise<PSeason>);
+  season: (args: undefined, obj: { root: GameAsParent<Extended>, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => PSeason | Promise<PSeason> | (() => Promise<PSeason>);
 }

@@ -7,21 +7,33 @@ export const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase(
 
 export const variableDeclarationIsAsync = (vd: tsMorph.VariableDeclaration) => !!vd.getFirstAncestorByKind(tsMorph.SyntaxKind.AsyncKeyword);
 
+export const inlineArgsForField = (field: graphql.GraphQLField<any, any>, config: { mapper: TypeMapper["map"] }) => {
+  return field.args?.length
+    // Always use an args obj
+    ? `{${
+      field.args.map((f) => {
+        const type = config.mapper(f.type, {});
+        if (!type) throw new Error(`No type for ${f.name} on ${field.name}!`);
+
+        const q = type?.includes("undefined") ? "?" : "";
+        const displayType = type.replace("| undefined", "");
+        return `${f.name}${q}: ${displayType}`;
+      }).join(", ")
+    }}`
+    : undefined;
+};
+
 export const createAndReferOrInlineArgsForField = (
   field: graphql.GraphQLField<any, any>,
   config: {
     name: string;
     file: tsMorph.SourceFile;
     mapper: TypeMapper["map"];
+    noSeparateType?: true;
   },
 ) => {
-  if (!field.args.length) return undefined;
-
-  // inline the type if it's small
-  const inlineArgs = "{" +
-    field.args.map((f) => `${f.name}: ${config.mapper(f.type, {})}`).join(", ") +
-    "}";
-
+  const inlineArgs = inlineArgsForField(field, config);
+  if (!inlineArgs) return undefined;
   if (inlineArgs.length < 120) return inlineArgs;
 
   const argsInterface = config.file.addInterface({

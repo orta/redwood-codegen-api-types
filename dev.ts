@@ -17,7 +17,7 @@ async function start() {
   if (cfg["MAIN_APP_PATH"]) {
     const appRoot = cfg["MAIN_APP_PATH"];
     const typesRoot = cfg["MAIN_TYPES_DEPLOY"];
-    await run(appRoot, typesRoot);
+    await run(appRoot, typesRoot, { runESLint: true });
   }
 }
 

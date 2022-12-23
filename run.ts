@@ -5,7 +5,7 @@ import { AppContext } from "./context.ts";
 import { lookAtServiceFile } from "./serviceFile.ts";
 import { FieldFacts } from "./typeFacts.ts";
 
-export async function run(appRoot: string, typesRoot: string) {
+export async function run(appRoot: string, typesRoot: string, config: { runESLint?: boolean } = {}) {
   const project = new Project({ useInMemoryFileSystem: true });
 
   let gqlSchema: graphql.GraphQLSchema | undefined;
@@ -93,6 +93,17 @@ export async function run(appRoot: string, typesRoot: string) {
   }
 
   createSharedSchemaFiles(appContext);
+  console.log(`Updated`, typesRoot);
 
-  console.log(`Updated`, appContext.settings.typesFolderRoot);
+  if (config.runESLint) {
+    console.log("Running ESLint...");
+    const process = Deno.run({
+      cwd: appRoot,
+      cmd: ["yarn", "eslint", "--fix", "--ext", ".d.ts", appContext.settings.typesFolderRoot],
+      stdin: "inherit",
+      stdout: "inherit",
+    });
+
+    await process.status();
+  }
 }

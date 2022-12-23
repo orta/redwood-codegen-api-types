@@ -1,4 +1,10 @@
-import { capitalizeFirstLetter, createAndReferOrInlineArgsForField, variableDeclarationIsAsync, varStartsWithUppercase } from "./utils.ts";
+import {
+  capitalizeFirstLetter,
+  createAndReferOrInlineArgsForField,
+  inlineArgsForField,
+  variableDeclarationIsAsync,
+  varStartsWithUppercase,
+} from "./utils.ts";
 import { typeMapper } from "./typeMap.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { AppContext } from "./context.ts";
@@ -163,6 +169,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       // only do it if the first letter is a capital
       if (!name.match(/^[A-Z]/)) return;
 
+      const type = d.getType();
+      const hasGenericArgs = type && type.getText().includes("<");
       const fieldFacts: FieldFacts = {};
 
       // Grab the const Thing = { ... }
@@ -189,9 +197,6 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       // Make an interface
 
       // Account: MergePrismaWithSdlTypes<PrismaAccount, MakeRelationsOptional<Account, AllMappedModels>, AllMappedModels>;
-
-      const prismaModel = context.prisma.get(name);
-
       const gqlType = gql.getType(d.getName());
       if (!gqlType) {
         // throw new Error(`Could not find a GraphQL type named ${d.getName()}`);
@@ -212,15 +217,17 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       // For more ideas
       const parentType = fileDTS.addTypeAlias({
         name: `${name}AsParent`,
+        typeParameters: hasGenericArgs ? ["Extended"] : [],
         type: `P${name} & { ${
           keys.map((k) => `${k}: () => Promise<${map(fields[k].type, {})}>`).join(
             ", \n",
           )
-        } }`,
+        } }` + (hasGenericArgs ? " & Extended" : ""),
       });
 
       const resolverInterface = fileDTS.addInterface({
         name: `${name}TypeResolvers`,
+        typeParameters: hasGenericArgs ? ["Extended"] : [],
         isExported: true,
       });
 
@@ -230,12 +237,10 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
           if (fieldFacts[k]) fieldFacts[k].hasResolverImplementation = true;
           else fieldFacts[k] = { hasResolverImplementation: true };
 
-          const argsType = field.args?.length
-            // Always use an args obj
-            ? `{${field.args.map((f) => `${f.name}: ${map(f.type, {})}`).join(", ")}}`
-            : undefined;
-
-          const innerArgs = `args: ${argsType}, obj: { root: ${name}AsParent, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
+          const argsType = inlineArgsForField(field, { mapper: map });
+          const param = hasGenericArgs ? "<Extended>" : "";
+          const innerArgs =
+            `args: ${argsType}, obj: { root: ${name}AsParent${param}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
 
           const returnObj = map(field.type, { preferNullOverUndefined: true });
           const returnType = `${returnObj} | Promise<${returnObj}> | (() => Promise<${returnObj}>)`;
@@ -243,11 +248,6 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
           resolverInterface.addProperty({
             name: k,
             docs: ["SDL: " + graphql.print(field.astNode!)],
-            // parameters: [{ name: "args", type: args }, {
-            //   name: "obj",
-            //   type: `{ root: ${d.getName()},  }`,
-            // }],
-            // returnType: map(field.type), // config.isAsync ? `Promise<${map(field.type)}>` : map(field.type),
             type: `(${innerArgs}) => ${returnType}`,
           });
         } else {
@@ -263,8 +263,3 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     });
   }
 };
-
-// parameters: [{ name: "args", type: argsParam }, {
-//   name: "obj",
-//   type: `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
-// }],
