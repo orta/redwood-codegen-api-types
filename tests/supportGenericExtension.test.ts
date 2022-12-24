@@ -17,14 +17,6 @@ type Game {
     homeTeamId: Int!
     awayTeamId: Int!
 }
-
-type Query {
-    games: [Game!]!
-}
-
-type Mutation {
-    createGame: Game!
-}
 `;
 
   const services = `

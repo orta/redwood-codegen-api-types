@@ -34,6 +34,7 @@ export async function run(appRoot: string, typesRoot: string, config: { runESLin
     apiServicesPath: path.join(appRoot, "api", "src", "services"),
     prismaDSLPath: path.join(appRoot, "api", "db", "schema.prisma"),
     sharedFilename: "shared-schema-types.d.ts",
+    sharedInternalFilename: "shared-return-types.d.ts",
     typesFolderRoot: typesRoot,
   };
 

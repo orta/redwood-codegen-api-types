@@ -30,8 +30,11 @@ export const typeMapper = (
     mapConfig: {
       parentWasNotNull?: true;
       preferNullOverUndefined?: true;
+      typenamePrefix?: string;
     },
   ): string | undefined => {
+    const prefix = mapConfig.typenamePrefix || "";
+
     // The AST for GQL uses a parent node to indicate the !, we need the opposite
     // for TS which uses '| undefined' after.
     if (graphql.isNonNullType(type)) {
@@ -69,23 +72,23 @@ export const typeMapper = (
         } else {
           // GraphQL only type
           referencedGraphQLTypes.add(type.name);
-          return type.name;
+          return prefix + type.name;
         }
       }
       if (graphql.isInterfaceType(type)) {
-        return type.name;
+        return prefix + type.name;
       }
       if (graphql.isUnionType(type)) {
         const types = type.getTypes();
         return types.map((t) => map(t, mapConfig)).join(" | ");
       }
       if (graphql.isEnumType(type)) {
-        return type.name;
+        return prefix + type.name;
       }
       if (graphql.isInputObjectType(type)) {
         referencedGraphQLTypes.add(type.name);
 
-        return type.name;
+        return prefix + type.name;
       }
 
       throw new Error(

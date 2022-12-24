@@ -12,6 +12,7 @@ export type AppContext = {
     graphQLSchemaPath: string;
     apiServicesPath: string;
     sharedFilename: string;
+    sharedInternalFilename: string;
     prismaDSLPath: string;
     typesFolderRoot: string;
   };

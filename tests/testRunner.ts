@@ -12,7 +12,11 @@ type Run = {
 
 export async function getDTSFilesForRun(run: Run) {
   const prisma = getPrismaSchema(run.prismaSchema);
-  const schema = gql.buildSchema(run.sdl);
+  let gqlSDL = run.sdl;
+  if (!gqlSDL.includes("type Query")) gqlSDL += "type Query { _: String }\n";
+  if (!gqlSDL.includes("type Mutation")) gqlSDL += "type Mutation { __: String }";
+
+  const schema = gql.buildSchema(gqlSDL);
   const project = new Project({ useInMemoryFileSystem: true });
 
   const vfs = new Map<string, string>();
@@ -29,6 +33,7 @@ export async function getDTSFilesForRun(run: Run) {
       apiServicesPath: "/api/src/services",
       prismaDSLPath: "/api/db/schema.prisma",
       sharedFilename: "shared-schema-types.d.ts",
+      sharedInternalFilename: "shared-return-types.d.ts",
       typesFolderRoot: "/types",
     },
     readFile: (path: string | URL) => {

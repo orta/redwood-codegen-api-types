@@ -43,12 +43,10 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
   const mutationType = gql.getMutationType();
   if (!mutationType) throw new Error("No mutation type");
 
-  const { map, getReferencedGraphQLThingsInMapping } = typeMapper(context, {
-    preferPrismaModels: true,
-  });
+  const externalMapper = typeMapper(context, { preferPrismaModels: true });
+  const returnTypeMapper = typeMapper(context, {});
 
   queryResolvers.forEach((v, i) => {
-    // if (i !== 8) return;
     addTypeForQueryResolver(v.getName(), {
       parentName: queryType.name,
       // This does not work
@@ -72,7 +70,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     namedImports: ["RedwoodGraphQLContext"],
   });
 
-  const sharedGraphQLObjectsReferenced = getReferencedGraphQLThingsInMapping();
+  const sharedGraphQLObjectsReferenced = externalMapper.getReferencedGraphQLThingsInMapping();
   if (sharedGraphQLObjectsReferenced.types.length) {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
@@ -81,16 +79,27 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     });
   }
 
-  if (sharedGraphQLObjectsReferenced.scalars.length) {
+  const sharedInternalGraphQLObjectsReferenced = returnTypeMapper.getReferencedGraphQLThingsInMapping();
+  if (sharedInternalGraphQLObjectsReferenced.types.length) {
+    fileDTS.addImportDeclaration({
+      isTypeOnly: true,
+      moduleSpecifier: `./${settings.sharedInternalFilename.replace(".d.ts", "")}`,
+      namedImports: sharedInternalGraphQLObjectsReferenced.types.map((t) => `${t} as RT${t}`),
+    });
+  }
+
+  const aliases = [...new Set([...sharedGraphQLObjectsReferenced.scalars, ...sharedInternalGraphQLObjectsReferenced.scalars])];
+  if (aliases.length) {
     fileDTS.addTypeAliases(
-      sharedGraphQLObjectsReferenced.scalars.map((s) => ({
+      aliases.map((s) => ({
         name: s,
         type: "any",
       })),
     );
   }
 
-  if (sharedGraphQLObjectsReferenced.prisma.length) {
+  const prismases = [...new Set([...sharedGraphQLObjectsReferenced.prisma, ...sharedInternalGraphQLObjectsReferenced.prisma])];
+  if (prismases.length) {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
       moduleSpecifier: "@prisma/client",
@@ -114,10 +123,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     name: string,
     config: { isAsync: boolean; parentName: string },
   ) {
-    let isQuery = true;
     let field = queryType!.getFields()[name];
     if (!field) {
-      isQuery = false;
       field = mutationType!.getFields()[name];
     }
     if (!field) {
@@ -138,14 +145,13 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     const args = createAndReferOrInlineArgsForField(field, {
       name: interfaceDeclaration.getName(),
       file: fileDTS,
-      mapper: map,
+      mapper: externalMapper.map,
     });
 
     const argsParam = args || "{}";
 
     const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "{}" : config.parentName;
-
-    const tType = map(field.type, { preferNullOverUndefined: true });
+    const tType = returnTypeMapper.map(field.type, { preferNullOverUndefined: true, typenamePrefix: "RT" });
     const returnType = `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
 
     interfaceDeclaration.addCallSignature({
@@ -215,11 +221,11 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
       // See:   https://github.com/redwoodjs/redwood/pull/6228#issue-1342966511
       // For more ideas
-      const parentType = fileDTS.addTypeAlias({
+      fileDTS.addTypeAlias({
         name: `${name}AsParent`,
         typeParameters: hasGenericArgs ? ["Extended"] : [],
         type: `P${name} & { ${
-          keys.map((k) => `${k}: () => Promise<${map(fields[k].type, {})}>`).join(
+          keys.map((k) => `${k}: () => Promise<${externalMapper.map(fields[k].type, {})}>`).join(
             ", \n",
           )
         } }` + (hasGenericArgs ? " & Extended" : ""),
@@ -237,16 +243,17 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
           if (fieldFacts[k]) fieldFacts[k].hasResolverImplementation = true;
           else fieldFacts[k] = { hasResolverImplementation: true };
 
-          const argsType = inlineArgsForField(field, { mapper: map });
+          const argsType = inlineArgsForField(field, { mapper: externalMapper.map });
           const param = hasGenericArgs ? "<Extended>" : "";
           const innerArgs =
             `args: ${argsType}, obj: { root: ${name}AsParent${param}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
 
-          const returnObj = map(field.type, { preferNullOverUndefined: true });
+          const returnObj = returnTypeMapper.map(field.type, { preferNullOverUndefined: true, typenamePrefix: "RT" });
           const returnType = `${returnObj} | Promise<${returnObj}> | (() => Promise<${returnObj}>)`;
 
           resolverInterface.addProperty({
             name: k,
+            leadingTrivia: "\n",
             docs: ["SDL: " + graphql.print(field.astNode!)],
             type: `(${innerArgs}) => ${returnType}`,
           });
