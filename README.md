@@ -21,6 +21,8 @@ There are two params you can optionally pass:
 
 The codegen will generate a `.d.ts` file for each service in your Redwood project, and 2 shared `.d.ts` files which contains all of the types for the whole schema. The types are generated from the GraphQL SDL, and the Prisma schema combined, so each `[service].d.ts` will only contain code which is relevant to that file.
 
+It is now pretty much feature complete, having taken the number of compiler errors in my app down from ~160 to 0.
+
 ## Why
 
 Redwood's type generation is pretty reasonable for most projects, but I've found after ~15 months of using Redwood when I turned on TypeScript's strict mode, I've never once achieved 0 compiler messages and performance for auto-complete/errors was not great inside the API files.
@@ -144,3 +146,12 @@ This is useful if you want to test your code against a real Redwood project, whi
 
 - Watch mode
 - Create an 'unused resolvers' interface for auto-complete on the main type resolvers? Unsure, feels a bit messy but might make for a good DX for redwood newbies
+
+## Deployment
+
+This is a Deno app which used 'DNT' to deploy to npm, so you can run `deno task build:npm [version]` to build a node compatible version of the app.
+
+```sh
+deno task build:npm 0.0.1
+deno task deploy:npm
+```

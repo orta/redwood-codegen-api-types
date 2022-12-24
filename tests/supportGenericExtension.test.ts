@@ -1,4 +1,4 @@
-import { assertStringIncludes } from "https://deno.land/std@0.108.0/testing/asserts.ts";
+import { assertStringIncludes } from "https://deno.land/std@0.166.0/testing/asserts.ts";
 import { assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
 import { getDTSFilesForRun, graphql, prisma } from "./testRunner.ts";
 
