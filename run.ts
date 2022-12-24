@@ -46,6 +46,8 @@ export async function run(appRoot: string, typesRoot: string, config: { runESLin
     tsProject: project,
     fieldFacts: new Map<string, FieldFacts>(),
     settings,
+    readFile: Deno.readTextFile,
+    writeTextFile: Deno.writeTextFile,
   };
 
   // Test one rando file
@@ -92,7 +94,7 @@ export async function run(appRoot: string, typesRoot: string, config: { runESLin
     await lookAtServiceFile(path, appContext);
   }
 
-  createSharedSchemaFiles(appContext);
+  await createSharedSchemaFiles(appContext);
   console.log(`Updated`, typesRoot);
 
   if (config.runESLint) {

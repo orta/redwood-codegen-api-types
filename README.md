@@ -110,17 +110,18 @@ You can see what it looks like when running on a small, but real, Redwood projec
 - Install deno
 - Clone the repo
 - Run `deno task dev` to start the dev server
+- Run tests via `deno task test`
 
 The dev server will re-run against the fixtures in `tests/vendor`, you can use git to work with the diff.
 
 You can make a `.env` in the root, and the dev server will _also_ run against these paths:
 
-```
-
+```s
 MAIN_APP_PATH="/home/orta/dev/app/"
 MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
-
 ```
+
+This is useful if you want to test your code against a real Redwood project, while also being able to see how it changes with the vendored sdl + services.
 
 ## Done
 
@@ -134,6 +135,7 @@ MAIN_TYPES_DEPLOY="/home/orta/dev/redwood-codegen-api-types/ignored/"
 
 - Feel good that all [these types](https://github.com/redwoodjs/redwood/pull/6228) are accounted for
 - Figure out how to make a 'return position' version of a GQL type, and understand how to determine which is the one we want to use
+- Watch mode
 
 - Tests (I've added some fixtures, but I'm mostly testing by running against my main app )
 - Create an 'unused resolvers' interface for auto-complete on the main type resolvers?

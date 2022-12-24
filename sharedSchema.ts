@@ -4,7 +4,7 @@ import { AppContext } from "./context.ts";
 import { graphql, path, tsMorph } from "./deps.ts";
 import { typeMapper } from "./typeMap.ts";
 
-export const createSharedSchemaFiles = (context: AppContext) => {
+export const createSharedSchemaFiles = async (context: AppContext) => {
   // We want to make a file with everything except Query and Mutation in it.
   const { gql, prisma, fieldFacts } = context;
 
@@ -88,7 +88,7 @@ export const createSharedSchemaFiles = (context: AppContext) => {
 
   tsFile.formatText({ indentSize: 2 });
 
-  Deno.writeTextFileSync(
+  await context.writeTextFile(
     path.join(
       context.settings.typesFolderRoot,
       context.settings.sharedFilename,

@@ -5,6 +5,7 @@
     }
   },
   "tasks": {
-    "dev": "deno run --allow-all --unstable --watch dev.ts"
+    "dev": "deno run --allow-all --unstable --watch dev.ts",
+    "test": "deno test --allow-all"
   }
 }

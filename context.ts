@@ -15,4 +15,6 @@ export type AppContext = {
     prismaDSLPath: string;
     typesFolderRoot: string;
   };
+  readFile: typeof Deno.readTextFile;
+  writeTextFile: typeof Deno.writeTextFile;
 };

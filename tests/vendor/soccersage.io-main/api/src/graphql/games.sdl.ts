@@ -12,6 +12,10 @@ export const schema = gql`
         awayTeam: Team!
         season: Season!
         startDateTime: DateTime!
+
+        # This does not exist in prisma, and would
+        # screw up a return type of db.game in many places
+        teamsWhoPredictedHomeWin: [Team!]!
     }
 
     type Query {

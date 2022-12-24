@@ -11,14 +11,14 @@ import { AppContext } from "./context.ts";
 import { FieldFacts } from "./typeFacts.ts";
 
 export const lookAtServiceFile = async (file: string, context: AppContext) => {
-  const { gql, prisma, tsProject, settings } = context;
+  const { gql, prisma, settings } = context;
 
   if (!gql) throw new Error("No schema");
   if (!prisma) throw new Error("No prisma schema");
 
   // This isn't good enough, needs to be relative to api/src/services
   const filename = path.basename(file);
-  const fileContents = await Deno.readTextFile(file);
+  const fileContents = await context.readFile(file);
   const referenceFileSourceFile = context.tsProject.createSourceFile(
     `/source/${filename}`,
     fileContents,
@@ -41,7 +41,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
   if (!queryType) throw new Error("No query type");
 
   const mutationType = gql.getMutationType();
-  if (!mutationType) throw new Error("No query type");
+  if (!mutationType) throw new Error("No mutation type");
 
   const { map, getReferencedGraphQLThingsInMapping } = typeMapper(context, {
     preferPrismaModels: true,
@@ -100,7 +100,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
   fileDTS.formatText({ indentSize: 2 });
 
-  Deno.writeTextFileSync(
+  await context.writeTextFile(
     path.join(
       context.settings.typesFolderRoot,
       filename.replace(".ts", ".d.ts"),
