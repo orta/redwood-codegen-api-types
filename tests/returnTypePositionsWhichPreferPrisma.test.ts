@@ -40,13 +40,13 @@ export const Game = {
   assertEquals(
     dts,
     `
+import type { Game as RTGame } from "./shared-return-types";
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
-import type { Game as RTGame } from "./shared-return-types";
 
 /** SDL: game: Game */
 export interface GameResolver {
-  (args: {}, obj: { root: {}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
+  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
 }
 
 type GameAsParent = PGame & { summary: () => Promise<string> };

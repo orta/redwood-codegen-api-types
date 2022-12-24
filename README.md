@@ -17,6 +17,11 @@ There are two params you can optionally pass:
 - [1] The cwd of your Redwood project: (`.` default)
 - [2] The folder you want the types to get added to: (`./api/src/lib/types` default)
 
+With the following extra possible args:
+
+- [`--eslint-fix`] - auto apply ESLint fixes to the new changed files
+- [`--rm-default-api-types] - remove the default API type file at `[app_root]/api/types/graphql.d.ts`
+
 ## What does that do?
 
 The codegen will generate a `.d.ts` file for each service in your Redwood project, and 2 shared `.d.ts` files which contains all of the types for the whole schema. The types are generated from the GraphQL SDL, and the Prisma schema combined, so each `[service].d.ts` will only contain code which is relevant to that file.

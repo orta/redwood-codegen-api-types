@@ -58,18 +58,6 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     addCustomTypeResolvers(c, {});
   });
 
-  fileDTS.addImportDeclaration({
-    isTypeOnly: true,
-    moduleSpecifier: "graphql",
-    namedImports: ["GraphQLResolveInfo"],
-  });
-
-  fileDTS.addImportDeclaration({
-    isTypeOnly: true,
-    moduleSpecifier: "@redwoodjs/graphql-server/dist/functions/types",
-    namedImports: ["RedwoodGraphQLContext"],
-  });
-
   const sharedGraphQLObjectsReferenced = externalMapper.getReferencedGraphQLThingsInMapping();
   if (sharedGraphQLObjectsReferenced.types.length) {
     fileDTS.addImportDeclaration({
@@ -104,6 +92,22 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       isTypeOnly: true,
       moduleSpecifier: "@prisma/client",
       namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) => `${p} as P${p}`),
+    });
+  }
+
+  if (fileDTS.getText().includes("GraphQLResolveInfo")) {
+    fileDTS.addImportDeclaration({
+      isTypeOnly: true,
+      moduleSpecifier: "graphql",
+      namedImports: ["GraphQLResolveInfo"],
+    });
+  }
+
+  if (fileDTS.getText().includes("RedwoodGraphQLContext")) {
+    fileDTS.addImportDeclaration({
+      isTypeOnly: true,
+      moduleSpecifier: "@redwoodjs/graphql-server/dist/functions/types",
+      namedImports: ["RedwoodGraphQLContext"],
     });
   }
 
@@ -148,9 +152,9 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       mapper: externalMapper.map,
     });
 
-    const argsParam = args || "{}";
+    const argsParam = args || "object";
 
-    const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "{}" : config.parentName;
+    const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "object" : config.parentName;
     const tType = returnTypeMapper.map(field.type, { preferNullOverUndefined: true, typenamePrefix: "RT" });
     const returnType = `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
 

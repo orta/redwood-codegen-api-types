@@ -5,7 +5,7 @@ import { AppContext } from "./context.ts";
 import { lookAtServiceFile } from "./serviceFile.ts";
 import { FieldFacts } from "./typeFacts.ts";
 
-export async function run(appRoot: string, typesRoot: string, config: { runESLint?: boolean } = {}) {
+export async function run(appRoot: string, typesRoot: string, config: { runESLint?: boolean; deleteOldGraphQLDTS?: boolean } = {}) {
   const project = new Project({ useInMemoryFileSystem: true });
 
   let gqlSchema: graphql.GraphQLSchema | undefined;
@@ -108,5 +108,10 @@ export async function run(appRoot: string, typesRoot: string, config: { runESLin
     });
 
     await process.status();
+  }
+
+  if (config.deleteOldGraphQLDTS) {
+    console.log("Deleting old graphql.d.ts");
+    await Deno.remove(path.join(appRoot, "api", "src", "graphql.d.ts"));
   }
 }

@@ -8,6 +8,6 @@
     "dev": "deno run --allow-all --unstable --watch dev.ts",
     "test": "deno test --allow-all",
     "build:npm": "deno run --allow-all scripts/buildNPM.ts",
-    "deploy:npm": "cd npm && npm publish && cd .."
+    "deploy:npm": "cd npm && npm publish && cd .. && rm -rf npm"
   }
 }

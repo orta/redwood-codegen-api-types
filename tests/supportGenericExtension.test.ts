@@ -33,9 +33,6 @@ export const Game: GameResolvers<{ type: string }> = {};
   assertEquals(
     vfs.get("/types/games.d.ts"),
     `
-import type { GraphQLResolveInfo } from "graphql";
-import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
-
 type GameAsParent<Extended> = PGame & {} & Extended;
 
 export interface GameTypeResolvers<Extended> {
