@@ -205,6 +205,14 @@ async function createSharedReturnPositionSchemaFile(context: AppContext) {
       moduleSpecifier: `@prisma/client`,
       namedImports: allPrismaModels.map((p) => `${p} as P${p}`),
     });
+
+    allPrismaModels.forEach((p) => {
+      externalTSFile.addTypeAlias({
+        isExported: true,
+        name: p,
+        type: `P${p}`,
+      });
+    });
   }
 
   externalTSFile.formatText({ indentSize: 2 });

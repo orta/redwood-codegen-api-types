@@ -163,3 +163,8 @@ export interface UpdateUserInput {
 
 type DateTime = any;
 type JSON = any;
+export type Game = PGame;
+export type Prediction = PPrediction;
+export type Season = PSeason;
+export type Team = PTeam;
+export type User = PUser;
