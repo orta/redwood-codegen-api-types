@@ -41,6 +41,7 @@ export const Game = {
     dts,
     `
 import type { Game as RTGame } from "./shared-return-types";
+import type { Game as PGame } from "@prisma/client";
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
 

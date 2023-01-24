@@ -33,6 +33,7 @@ export const Game: GameResolvers<{ type: string }> = {};
   assertEquals(
     vfs.get("/types/games.d.ts"),
     `
+import type { Game as PGame } from "@prisma/client";\n
 type GameAsParent<Extended> = PGame & {} & Extended;
 
 export interface GameTypeResolvers<Extended> {
