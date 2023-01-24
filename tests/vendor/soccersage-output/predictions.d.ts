@@ -1,6 +1,6 @@
 import type { CreatePredictionInput, UpdatePredictionInput } from "./shared-schema-types";
 import type { StandingsResult as RTStandingsResult, Prediction as RTPrediction, User as RTUser, Team as RTTeam, Game as RTGame } from "./shared-return-types";
-import type { User as PUser, Team as PTeam, Game as PGame } from "@prisma/client";
+import type { User as PUser, Team as PTeam, Game as PGame, Prediction as PPrediction } from "@prisma/client";
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
 

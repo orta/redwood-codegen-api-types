@@ -46,6 +46,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
   const externalMapper = typeMapper(context, { preferPrismaModels: true });
   const returnTypeMapper = typeMapper(context, {});
 
+  const extraPrismaReferences = new Set<string>();
+
   queryResolvers.forEach((v, i) => {
     addTypeForQueryResolver(v.getName(), {
       parentName: queryType.name,
@@ -86,12 +88,19 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
     );
   }
 
-  const prismases = [...new Set([...sharedGraphQLObjectsReferenced.prisma, ...sharedInternalGraphQLObjectsReferenced.prisma])];
+  const prismases = [
+    ...new Set([
+      ...sharedGraphQLObjectsReferenced.prisma,
+      ...sharedInternalGraphQLObjectsReferenced.prisma,
+      ...(extraPrismaReferences.values() || []),
+    ]),
+  ];
+
   if (prismases.length) {
     fileDTS.addImportDeclaration({
       isTypeOnly: true,
       moduleSpecifier: "@prisma/client",
-      namedImports: sharedGraphQLObjectsReferenced.prisma.map((p) => `${p} as P${p}`),
+      namedImports: prismases.map((p) => `${p} as P${p}`),
     });
   }
 
@@ -222,6 +231,8 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       }
 
       const fields = gqlType.getFields();
+
+      extraPrismaReferences.add(name);
 
       // See:   https://github.com/redwoodjs/redwood/pull/6228#issue-1342966511
       // For more ideas

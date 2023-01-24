@@ -1,6 +1,6 @@
 import type { CreateSeasonInput, UpdateSeasonInput } from "./shared-schema-types";
 import type { Season as RTSeason, Prediction as RTPrediction } from "./shared-return-types";
-import type { Prediction as PPrediction } from "@prisma/client";
+import type { Prediction as PPrediction, Season as PSeason } from "@prisma/client";
 import type { GraphQLResolveInfo } from "graphql";
 import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
 
