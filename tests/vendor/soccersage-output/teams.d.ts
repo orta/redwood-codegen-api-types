@@ -6,27 +6,27 @@ import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/funct
 
 /** SDL: teams: [Team!]! */
 export interface TeamsResolver {
-  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam[] | Promise<RTTeam[]> | (() => Promise<RTTeam[]>);
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam[] | Promise<RTTeam[]> | (() => Promise<RTTeam[]>);
 }
 
 /** SDL: team(id: Int!): Team */
 export interface TeamResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | null | Promise<RTTeam | null> | (() => Promise<RTTeam | null>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | null | Promise<RTTeam | null> | (() => Promise<RTTeam | null>);
 }
 
 /** SDL: createTeam(input: CreateTeamInput!): Team! */
 export interface CreateTeamResolver {
-  (args: { input: CreateTeamInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | Promise<RTTeam> | (() => Promise<RTTeam>);
+  (args: { input: CreateTeamInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | Promise<RTTeam> | (() => Promise<RTTeam>);
 }
 
 /** SDL: updateTeam(id: Int!, input: UpdateTeamInput!): Team! */
 export interface UpdateTeamResolver {
-  (args: { id: number, input: UpdateTeamInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | Promise<RTTeam> | (() => Promise<RTTeam>);
+  (args: { id: number, input: UpdateTeamInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | Promise<RTTeam> | (() => Promise<RTTeam>);
 }
 
 /** SDL: deleteTeam(id: Int!): Team! */
 export interface DeleteTeamResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | Promise<RTTeam> | (() => Promise<RTTeam>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTTeam | Promise<RTTeam> | (() => Promise<RTTeam>);
 }
 
 type TeamAsParent = PTeam & {

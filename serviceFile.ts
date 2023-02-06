@@ -48,13 +48,10 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
   const extraPrismaReferences = new Set<string>();
 
-  queryResolvers.forEach((v, i) => {
-    addTypeForQueryResolver(v.getName(), {
-      parentName: queryType.name,
-      // This does not work
-      isAsync: variableDeclarationIsAsync(v),
-    });
-  });
+  // Add the root resolvers
+  queryResolvers.forEach((v) =>
+    addTypeForQueryResolver(v.getName(), getResolverInformationForDeclaration(v.getInitializer(), queryType.name))
+  );
 
   resolverContainers.forEach((c) => {
     addCustomTypeResolvers(c, {});
@@ -134,7 +131,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
   function addTypeForQueryResolver(
     name: string,
-    config: { isAsync: boolean; parentName: string },
+    config: ResolverTypeInformation,
   ) {
     let field = queryType!.getFields()[name];
     if (!field) {
@@ -165,12 +162,20 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
     const parentType = config.parentName === "Query" || config.parentName === "Mutation" ? "object" : config.parentName;
     const tType = returnTypeMapper.map(field.type, { preferNullOverUndefined: true, typenamePrefix: "RT" });
-    const returnType = `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
+
+    let returnType = tType;
+    const all = `${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
+
+    if (config.isFunc && config.isAsync) returnType = `Promise<${tType}>`;
+    else if (config.isFunc) returnType = all;
+    else if (config.isObjLiteral) returnType = tType;
+    else if (config.isUnknown) returnType = all;
 
     interfaceDeclaration.addCallSignature({
-      parameters: [{ name: "args", type: argsParam }, {
+      parameters: [{ name: "args", type: argsParam, hasQuestionToken: config.funcArgCount < 1 }, {
         name: "obj",
         type: `{ root: ${parentType}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`,
+        hasQuestionToken: config.funcArgCount < 2,
       }],
       returnType,
     });
@@ -203,13 +208,21 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       }
 
       // Get a list of the defined keys
-      const keys: string[] = [];
+      const keys: { name: string; info: ResolverTypeInformation }[] = [];
       obj.getProperties().forEach((p) => {
-        if (p.isKind(tsMorph.SyntaxKind.PropertyAssignment)) {
-          keys.push(p.getName());
+        if (p.isKind(tsMorph.SyntaxKind.SpreadAssignment)) {
+          return;
+        }
+
+        // keys.push({ name: p.getName(), info:  });
+
+        if (p.isKind(tsMorph.SyntaxKind.PropertyAssignment) && p.hasInitializer()) {
+          const name = p.getName();
+          keys.push({ name, info: getResolverInformationForDeclaration(p.getInitializerOrThrow(), name) });
         }
         if (p.isKind(tsMorph.SyntaxKind.FunctionDeclaration) && p.getName()) {
-          keys.push(p.getName()!);
+          const name = p.getName();
+          keys.push({ name, info: getResolverInformationForDeclaration(p as any, name) });
         }
       });
 
@@ -240,7 +253,7 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
         name: `${name}AsParent`,
         typeParameters: hasGenericArgs ? ["Extended"] : [],
         type: `P${name} & { ${
-          keys.map((k) => `${k}: () => Promise<${externalMapper.map(fields[k].type, {})}>`).join(
+          keys.map((k) => `${k.name}: () => Promise<${externalMapper.map(fields[k.name].type, {})}>`).join(
             ", \n",
           )
         } }` + (hasGenericArgs ? " & Extended" : ""),
@@ -252,30 +265,41 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
         isExported: true,
       });
 
-      keys.forEach((k) => {
-        const field = fields[k];
+      keys.forEach((key) => {
+        const { name: fieldName, info } = key;
+        const field = fields[fieldName];
         if (field) {
-          if (fieldFacts[k]) fieldFacts[k].hasResolverImplementation = true;
-          else fieldFacts[k] = { hasResolverImplementation: true };
+          if (fieldFacts[fieldName]) fieldFacts[fieldName].hasResolverImplementation = true;
+          else fieldFacts[fieldName] = { hasResolverImplementation: true };
 
           const argsType = inlineArgsForField(field, { mapper: externalMapper.map });
           const param = hasGenericArgs ? "<Extended>" : "";
-          const innerArgs =
-            `args: ${argsType}, obj: { root: ${name}AsParent${param}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
 
-          const returnObj = returnTypeMapper.map(field.type, { preferNullOverUndefined: true, typenamePrefix: "RT" });
-          const returnType = `${returnObj} | Promise<${returnObj}> | (() => Promise<${returnObj}>)`;
+          const firstQ = info.funcArgCount < 1 ? "?" : "";
+          const secondQ = info.funcArgCount < 2 ? "?" : "";
+          const innerArgs =
+            `args${firstQ}: ${argsType}, obj${secondQ}: { root: ${name}AsParent${param}, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }`;
+
+          const tType = returnTypeMapper.map(field.type, { preferNullOverUndefined: true, typenamePrefix: "RT" });
+
+          let returnType = tType;
+          const all = `=> ${tType} | Promise<${tType}> | (() => Promise<${tType}>)`;
+
+          if (info.isFunc && info.isAsync) returnType = ` => Promise<${tType}>`;
+          else if (info.isFunc) returnType = all;
+          else if (info.isObjLiteral) returnType = tType;
+          else if (info.isUnknown) returnType = all;
 
           resolverInterface.addProperty({
-            name: k,
+            name: fieldName,
             leadingTrivia: "\n",
             docs: ["SDL: " + graphql.print(field.astNode!)],
-            type: `(${innerArgs}) => ${returnType}`,
+            type: info.isFunc || info.isUnknown ? `(${innerArgs}) ${returnType}` : returnType,
           });
         } else {
           resolverInterface.addCallSignature({
             docs: [
-              ` @deprecated: SDL ${d.getName()}.${k} does not exist in your schema`,
+              ` @deprecated: SDL ${d.getName()}.${fieldName} does not exist in your schema`,
             ],
           });
         }
@@ -284,4 +308,69 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
       context.fieldFacts.set(d.getName(), fieldFacts);
     });
   }
+};
+
+type ResolverTypeInformation = {
+  isFunc: boolean;
+  isAsync: boolean;
+  isUnknown: boolean;
+  parentName: string;
+  funcArgCount: number;
+  isObjLiteral: boolean;
+};
+
+const getResolverInformationForDeclaration = (
+  initialiser: tsMorph.Expression<tsMorph.ts.Expression> | undefined,
+  parentName: string,
+): ResolverTypeInformation => {
+  // Who knows what folks could do, lets not crash
+  if (!initialiser) {
+    return {
+      parentName,
+      funcArgCount: 0,
+      isFunc: false,
+      isAsync: false,
+      isUnknown: true,
+      isObjLiteral: false,
+    };
+  }
+
+  // resolver is a fn
+  if (initialiser.isKind(tsMorph.SyntaxKind.ArrowFunction) || initialiser.isKind(tsMorph.SyntaxKind.FunctionExpression)) {
+    return {
+      parentName,
+      funcArgCount: initialiser.getParameters().length,
+      isFunc: true,
+      isAsync: initialiser.isAsync(),
+      isUnknown: false,
+      isObjLiteral: false,
+    };
+  }
+
+  // resolver is a raw obj
+  if (
+    initialiser.isKind(tsMorph.SyntaxKind.ObjectLiteralExpression) || initialiser.isKind(tsMorph.SyntaxKind.StringLiteral) ||
+    initialiser.isKind(tsMorph.SyntaxKind.NumericLiteral) || initialiser.isKind(tsMorph.SyntaxKind.TrueKeyword) ||
+    initialiser.isKind(tsMorph.SyntaxKind.FalseKeyword) || initialiser.isKind(tsMorph.SyntaxKind.NullKeyword) ||
+    initialiser.isKind(tsMorph.SyntaxKind.UndefinedKeyword)
+  ) {
+    return {
+      parentName,
+      funcArgCount: 0,
+      isFunc: false,
+      isAsync: false,
+      isUnknown: false,
+      isObjLiteral: true,
+    };
+  }
+
+  // who knows
+  return {
+    parentName,
+    funcArgCount: 0,
+    isFunc: false,
+    isAsync: false,
+    isUnknown: true,
+    isObjLiteral: false,
+  };
 };

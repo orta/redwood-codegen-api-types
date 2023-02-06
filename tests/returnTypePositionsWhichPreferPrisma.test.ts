@@ -47,7 +47,7 @@ import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/funct
 
 /** SDL: game: Game */
 export interface GameResolver {
-  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
 }
 
 type GameAsParent = PGame & { summary: () => Promise<string> };

@@ -6,37 +6,37 @@ import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/funct
 
 /** SDL: users: [User!]! */
 export interface UsersResolver {
-  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser[] | Promise<RTUser[]> | (() => Promise<RTUser[]>);
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser[] | Promise<RTUser[]> | (() => Promise<RTUser[]>);
 }
 
 /** SDL: user(id: Int!): User */
 export interface UserResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | null | Promise<RTUser | null> | (() => Promise<RTUser | null>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | null | Promise<RTUser | null> | (() => Promise<RTUser | null>);
 }
 
 /** SDL: createUser(input: CreateUserInput!): User! */
 export interface CreateUserResolver {
-  (args: { input: CreateUserInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
+  (args: { input: CreateUserInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
 }
 
 /** SDL: updateUser(id: Int!, input: UpdateUserInput!): User! */
 export interface UpdateUserResolver {
-  (args: { id: number, input: UpdateUserInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
+  (args: { id: number, input: UpdateUserInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
 }
 
 /** SDL: deleteUser(id: Int!): User! */
 export interface DeleteUserResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
 }
 
 /** SDL: sendResetPasswordEmail(email: String!): SuccessInput */
 export interface SendResetPasswordEmailResolver {
-  (args: { email: string }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSuccessInput | null | Promise<RTSuccessInput | null> | (() => Promise<RTSuccessInput | null>);
+  (args: { email: string }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): Promise<RTSuccessInput | null>;
 }
 
 /** SDL: resetPassword(password: String!, resetToken: String!): User! */
 export interface ResetPasswordResolver {
-  (args: { password: string, resetToken: string }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTUser | Promise<RTUser> | (() => Promise<RTUser>);
+  (args: { password: string, resetToken: string }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): Promise<RTUser>;
 }
 
 type UserAsParent = PUser & {

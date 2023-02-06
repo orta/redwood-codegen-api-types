@@ -6,27 +6,27 @@ import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/funct
 
 /** SDL: seasons: [Season!]! */
 export interface SeasonsResolver {
-  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason[] | Promise<RTSeason[]> | (() => Promise<RTSeason[]>);
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason[] | Promise<RTSeason[]> | (() => Promise<RTSeason[]>);
 }
 
 /** SDL: season(id: Int!): Season */
 export interface SeasonResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | null | Promise<RTSeason | null> | (() => Promise<RTSeason | null>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | null | Promise<RTSeason | null> | (() => Promise<RTSeason | null>);
 }
 
 /** SDL: createSeason(input: CreateSeasonInput!): Season! */
 export interface CreateSeasonResolver {
-  (args: { input: CreateSeasonInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | Promise<RTSeason> | (() => Promise<RTSeason>);
+  (args: { input: CreateSeasonInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | Promise<RTSeason> | (() => Promise<RTSeason>);
 }
 
 /** SDL: updateSeason(id: Int!, input: UpdateSeasonInput!): Season! */
 export interface UpdateSeasonResolver {
-  (args: { id: number, input: UpdateSeasonInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | Promise<RTSeason> | (() => Promise<RTSeason>);
+  (args: { id: number, input: UpdateSeasonInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | Promise<RTSeason> | (() => Promise<RTSeason>);
 }
 
 /** SDL: deleteSeason(id: Int!): Season! */
 export interface DeleteSeasonResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | Promise<RTSeason> | (() => Promise<RTSeason>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTSeason | Promise<RTSeason> | (() => Promise<RTSeason>);
 }
 
 type SeasonAsParent = PSeason & {

@@ -15,6 +15,11 @@ await build({
     deno: true,
     crypto: true,
   },
+
+  // Remove snapshots first then these can be brought back - https://github.com/denoland/dnt/issues/254
+  typeCheck: false,
+  test: false,
+
   packageManager: "pnpm",
   scriptModule: false,
 

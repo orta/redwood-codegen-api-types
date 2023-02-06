@@ -6,12 +6,12 @@ import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/funct
 
 /** SDL: standings(seasonId: Int!): StandingsResult */
 export interface StandingsResolver {
-  (args: { seasonId: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTStandingsResult | null | Promise<RTStandingsResult | null> | (() => Promise<RTStandingsResult | null>);
+  (args: { seasonId: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): Promise<RTStandingsResult | null>;
 }
 
 /** SDL: predictions: [Prediction!]! */
 export interface PredictionsResolver {
-  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction[] | Promise<RTPrediction[]> | (() => Promise<RTPrediction[]>);
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction[] | Promise<RTPrediction[]> | (() => Promise<RTPrediction[]>);
 }
 
 /** SDL: myPredictions: [Prediction!]! */
@@ -21,22 +21,22 @@ export interface MyPredictionsResolver {
 
 /** SDL: prediction(id: Int!): Prediction */
 export interface PredictionResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | null | Promise<RTPrediction | null> | (() => Promise<RTPrediction | null>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | null | Promise<RTPrediction | null> | (() => Promise<RTPrediction | null>);
 }
 
 /** SDL: createPrediction(input: CreatePredictionInput!): Prediction! */
 export interface CreatePredictionResolver {
-  (args: { input: CreatePredictionInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | Promise<RTPrediction> | (() => Promise<RTPrediction>);
+  (args: { input: CreatePredictionInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | Promise<RTPrediction> | (() => Promise<RTPrediction>);
 }
 
 /** SDL: updatePrediction(id: Int!, input: UpdatePredictionInput!): Prediction! */
 export interface UpdatePredictionResolver {
-  (args: { id: number, input: UpdatePredictionInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | Promise<RTPrediction> | (() => Promise<RTPrediction>);
+  (args: { id: number, input: UpdatePredictionInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | Promise<RTPrediction> | (() => Promise<RTPrediction>);
 }
 
 /** SDL: deletePrediction(id: Int!): Prediction! */
 export interface DeletePredictionResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | Promise<RTPrediction> | (() => Promise<RTPrediction>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTPrediction | Promise<RTPrediction> | (() => Promise<RTPrediction>);
 }
 
 type PredictionAsParent = PPrediction & {

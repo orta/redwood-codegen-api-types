@@ -111,6 +111,7 @@ export const User: UserTypeResolvers<{ cachedAccount?: Account }> = {
 - In dev mode it can run eslint fixes over the files it generates, so it is formatted correctly
 - You can use [an eslint rule to auto-hook](https://community.redwoodjs.com/t/custom-eslint-rules-in-redwood/4379) up the imports for you
 - Resolvers show what their SDL source of truth is when you hover over them
+- It manually type narrow's for your `async` resolvers, so that you can trivially re-use them from outside the service file e.g. on tests. Params are also made optional on the types if they are not included in the resolver's fn.
 
 ---
 

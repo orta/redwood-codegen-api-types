@@ -5,7 +5,10 @@ export const varStartsWithUppercase = (v: tsMorph.VariableDeclaration) => v.getN
 
 export const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const variableDeclarationIsAsync = (vd: tsMorph.VariableDeclaration) => !!vd.getFirstAncestorByKind(tsMorph.SyntaxKind.AsyncKeyword);
+export const variableDeclarationIsAsync = (vd: tsMorph.VariableDeclaration) => {
+  const res = !!vd.getFirstChildByKind(tsMorph.SyntaxKind.AsyncKeyword);
+  return res;
+};
 
 export const inlineArgsForField = (field: graphql.GraphQLField<any, any>, config: { mapper: TypeMapper["map"] }) => {
   return field.args?.length

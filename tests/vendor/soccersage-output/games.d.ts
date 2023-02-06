@@ -11,27 +11,27 @@ export interface GamesResolver {
 
 /** SDL: upcomingGames: [Game!]! */
 export interface UpcomingGamesResolver {
-  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame[] | Promise<RTGame[]> | (() => Promise<RTGame[]>);
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame[] | Promise<RTGame[]> | (() => Promise<RTGame[]>);
 }
 
 /** SDL: game(id: Int!): Game */
 export interface GameResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
 }
 
 /** SDL: createGame(input: CreateGameInput!): Game! */
 export interface CreateGameResolver {
-  (args: { input: CreateGameInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | Promise<RTGame> | (() => Promise<RTGame>);
+  (args: { input: CreateGameInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | Promise<RTGame> | (() => Promise<RTGame>);
 }
 
 /** SDL: updateGame(id: Int!, input: UpdateGameInput!): Game! */
 export interface UpdateGameResolver {
-  (args: { id: number, input: UpdateGameInput }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | Promise<RTGame> | (() => Promise<RTGame>);
+  (args: { id: number, input: UpdateGameInput }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | Promise<RTGame> | (() => Promise<RTGame>);
 }
 
 /** SDL: deleteGame(id: Int!): Game! */
 export interface DeleteGameResolver {
-  (args: { id: number }, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | Promise<RTGame> | (() => Promise<RTGame>);
+  (args: { id: number }, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): Promise<RTGame>;
 }
 
 type GameAsParent<Extended> = PGame & {

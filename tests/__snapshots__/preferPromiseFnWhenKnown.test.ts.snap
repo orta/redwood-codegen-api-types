@@ -1,0 +1,52 @@
+export const snapshot = {};
+
+snapshot[`uses a rn to promise when we see an async tag 1`] = `
+'import type { Game as RTGame } from "./shared-return-types";
+import type { Game as PGame } from "@prisma/client";
+import type { GraphQLResolveInfo } from "graphql";
+import type { RedwoodGraphQLContext } from "@redwoodjs/graphql-server/dist/functions/types";
+
+/** SDL: gameSync: Game */
+export interface GameSyncResolver {
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
+}
+
+/** SDL: gameAsync: Game */
+export interface GameAsyncResolver {
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): Promise<RTGame | null>;
+}
+
+/** SDL: gameAsync1Arg: Game */
+export interface GameAsync1ArgResolver {
+  (args: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
+}
+
+/** SDL: gameAsync2Arg: Game */
+export interface GameAsync2ArgResolver {
+  (args: object, obj: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null | Promise<RTGame | null> | (() => Promise<RTGame | null>);
+}
+
+/** SDL: gameObj: Game */
+export interface GameObjResolver {
+  (args?: object, obj?: { root: object, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }): RTGame | null;
+}
+
+type GameAsParent<Extended> = PGame & {
+  summary: () => Promise<string>,
+  summarySync: () => Promise<string>,
+  summaryAsync: () => Promise<string>
+} & Extended;
+
+export interface GameTypeResolvers<Extended> {
+
+  /** SDL: summary: String! */
+  summary: string;
+
+  /** SDL: summarySync: String! */
+  summarySync: (args?: undefined, obj?: { root: GameAsParent<Extended>, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => string | Promise<string> | (() => Promise<string>);
+
+  /** SDL: summaryAsync: String! */
+  summaryAsync: (args?: undefined, obj?: { root: GameAsParent<Extended>, context: RedwoodGraphQLContext, info: GraphQLResolveInfo }) => Promise<string>;
+}
+'
+`;
