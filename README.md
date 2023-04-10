@@ -1,3 +1,6 @@
+The long term goals of this repo is to get it in redwood, over time I will start moving the tech stack for this repo to be more inline with the code used inside redwood core.
+
+
 ## How to use this in a Redwood project
 
 In your root, add the dependency:
