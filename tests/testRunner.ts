@@ -39,7 +39,8 @@ export async function getDTSFilesForRun(run: Run) {
     readFile: (path: string | URL) => {
       return Promise.resolve(vfs.get(path.toString()) ?? "");
     },
-    writeTextFile: (path: string | URL, data: string) => {
+    writeTextFile: (path: string | URL, data: string | ReadableStream<string>) => {
+      if (typeof data !== "string") throw new Error("Not implemented yet");
       vfs.set(path.toString(), data);
       return Promise.resolve();
     },

@@ -249,14 +249,23 @@ export const lookAtServiceFile = async (file: string, context: AppContext) => {
 
       // See:   https://github.com/redwoodjs/redwood/pull/6228#issue-1342966511
       // For more ideas
+
+      const fieldFromASTKey = (key: typeof keys[number]) => {
+        const existsInGraphQLSchema = fields[key.name];
+        const type = existsInGraphQLSchema ? fields[key.name].type : new graphql.GraphQLScalarType({ name: "JSON" });
+        if (!existsInGraphQLSchema) {
+          console.warn(
+            `The service file ${filename} has a field ${key.name} on ${name} that does not exist in the generated schema.graphql`,
+          );
+        }
+        const prefix = !existsInGraphQLSchema ? "\n// This field does not exist in the generated schema.graphql\n" : "";
+        return `${prefix}${key.name}: () => Promise<${externalMapper.map(type, {})}>`;
+      };
+
       fileDTS.addTypeAlias({
         name: `${name}AsParent`,
         typeParameters: hasGenericArgs ? ["Extended"] : [],
-        type: `P${name} & { ${
-          keys.map((k) => `${k.name}: () => Promise<${externalMapper.map(fields[k.name].type, {})}>`).join(
-            ", \n",
-          )
-        } }` + (hasGenericArgs ? " & Extended" : ""),
+        type: `P${name} & { ${keys.map(fieldFromASTKey).join(", \n") + `} ` + (hasGenericArgs ? " & Extended" : "")}`,
       });
 
       const resolverInterface = fileDTS.addInterface({
